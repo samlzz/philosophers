@@ -6,14 +6,13 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/02/25 15:50:36 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/02/25 20:08:05 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 #define PHILO_H
 
-# include <sys/time.h>
 # include <pthread.h>
 # include <stdbool.h>
 

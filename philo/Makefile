@@ -7,7 +7,7 @@ OBJ_DIR = build/
 
 INCL_DIR = includes
 LIB_DIRS =
-LIB_FILES =
+LIB_FILES = pthread
 
 CC = gcc
 CFLAGS := -Wall -Wextra -Werror -MMD
