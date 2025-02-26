@@ -15,7 +15,10 @@ RM = rm -f
 MD = mkdir -p
 AR = ar rcs
 
-C_FILES =	...
+C_FILES =	init.c		\
+			philo.c		\
+			routine.c	\
+			utils.c
 
 #* Colors
 
