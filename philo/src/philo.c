@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/02/28 17:16:50 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/02/28 18:35:28 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void	_free_for_quit(t_data *d_ptr)
+void	destroy_data(t_data *d_ptr)
 {
 	size_t	i;
 
@@ -55,15 +55,25 @@ void print_data(t_data *data)
     }
 }
 
+void	monitoring(t_data *data)
+{
+
+}
+
 int main(int argc, char const *argv[])
 {
-	t_data	data;
+	t_data		data;
+	pthread_t	monitor;
+	size_t		i;
 
 	if (argc < 5 || argc > 6)
 		return (write(2, ERR_ARG_NB, 160), 1);	
 	if (init_data(&data, argc - 1, argv + 1))
 		return (write(2, ERR_INVALID_ARG, 126), 1);
-	print_data(&data);
-	_free_for_quit(&data);
+	pthread_create(&monitor, NULL, monitoring, &data);
+	while (data.count--)
+		pthread_join(data.philos[data.count].thread, NULL);
+	pthread_join(monitor, NULL);
+	destroy_data(&data);
 	return (0);
 }

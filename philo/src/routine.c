@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/28 15:32:18 by sliziard          #+#    #+#             */
-/*   Updated: 2025/02/28 17:59:08 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/02/28 18:29:03 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,11 +74,14 @@ void	philo_life(t_philo *phi)
 {
 	while (!phi->data->sim_end)
 	{
-		_check_death(phi);
 		_eat(phi);
-		_check_death(phi);
+		if (phi->data->sim_end)
+			break ;
 		_sleep(phi);
-		_check_death(phi);
+		if (phi->data->sim_end)
+			break ;
 		_think(phi);
+		if (phi->data->sim_end)
+			break ;
 	}
 }
