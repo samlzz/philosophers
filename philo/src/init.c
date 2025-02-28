@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:47:49 by sliziard          #+#    #+#             */
-/*   Updated: 2025/02/26 15:16:10 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/02/28 17:48:36 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,33 +15,31 @@
 #include <stdlib.h>
 #include <string.h>
 
-int	ft_satoi(char const *nptr, int *error)
+unsigned int ascii_to_uint(const char *nptr, int *error)
 {
-	long	r;
-	int		s;
+    unsigned long r;
 
-	r = 0;
-	s = 1;
-	*error = 0;
-	if (*nptr == '-' || *nptr == '+')
-	{
-		if (*nptr == '-')
-			s = -1;
-		nptr++;
-	}
-	while (*nptr >= '0' && *nptr <= '9' && *nptr)
-	{
-		r = (r * 10) + *nptr - '0';
-		if ((s == 1 && r > INT_MAX) || (s == -1 && (r * -1) < INT_MIN))
-		{
-			*error = 1;
-			return ((s == 1) * INT_MAX + (s != 1) * INT_MIN);
-		}
-		nptr++;
-	}
-	if (*nptr || *(nptr - 1) == '-' || *(nptr - 1) == '+')
-		*error = 1;
-	return ((int)r * s);
+    r = 0;
+    *error = 0;
+    if (!nptr || !*nptr)
+    {
+        *error = 1;
+        return 0;
+    }
+    while (*nptr >= '0' && *nptr <= '9')
+    {
+        r = (r * 10) + (*nptr - '0');
+        if (r > UINT_MAX)
+        {
+            *error = 1;
+            return (UINT_MAX);
+        }
+        nptr++;
+    }
+
+    if (*nptr)
+        *error = 1;
+    return (unsigned int)r;
 }
 
 pthread_mutex_t	*init_forks(size_t count)
@@ -60,7 +58,7 @@ pthread_mutex_t	*init_forks(size_t count)
 
 void	init_philos(t_data *d_ptr)
 {
-	int		i;
+	size_t	i;
 
 	memset(d_ptr->philos, 0, sizeof(t_philo) * d_ptr->count);
 	i = 0;
@@ -75,12 +73,21 @@ void	init_philos(t_data *d_ptr)
 	}
 }
 
-static int	_set_nb_field(int *field, char const *nb)
+static int	_set_nb_field(char const *nb, int *signed_field, unsigned int *field)
 {
-	int	has_err;
+	int				has_err;
+	unsigned int	value;
 
 	has_err = 0;
-	*field = ft_satoi(nb, &has_err);
+	value = ascii_to_uint(nb, &has_err);
+	if (signed_field)
+	{
+		if (value > INT_MAX)
+			return (1);
+		*signed_field = (int)value;
+	}
+	else
+		*field = value;
 	return (has_err);
 }
 
@@ -88,20 +95,17 @@ int	init_data(t_data *d_ptr, int ac, char const *av[])
 {
 	memset(d_ptr, 0, sizeof(t_data));
 	d_ptr->start_time = date_now();
-	if (_set_nb_field(&d_ptr->count, av[0]))
+	if (_set_nb_field(av[0], NULL, &d_ptr->count))
 		return (1);
-	if (_set_nb_field(&d_ptr->time_to_die, av[1]))
+	if (_set_nb_field(av[1], NULL, &d_ptr->time_to_die))
 		return (1);
-	if (_set_nb_field(&d_ptr->time_to_eat, av[2]))
+	if (_set_nb_field(av[2], NULL, &d_ptr->time_to_eat))
 		return (1);
-	if (_set_nb_field(&d_ptr->time_to_sleep, av[3]))
+	if (_set_nb_field(av[3], NULL, &d_ptr->time_to_sleep))
 		return (1);
-	if (ac == 5)
-	{
-		if (_set_nb_field(&d_ptr->must_eat_count, av[4]))
-			return (1);
-	}
-	else
+	if (ac == 5 && _set_nb_field(av[4], &d_ptr->must_eat_count, NULL))
+		return (1);
+	if (ac == 4)
 		d_ptr->must_eat_count = -1;
 	d_ptr->philos = malloc(sizeof(t_philo) * d_ptr->count);
 	if (!d_ptr->philos)

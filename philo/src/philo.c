@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/02/26 15:21:13 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/02/28 17:16:50 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 
 void	_free_for_quit(t_data *d_ptr)
 {
-	int	i;
+	size_t	i;
 
 	//todo manage philos threads
 	free(d_ptr->philos);
@@ -31,7 +31,7 @@ void	_free_for_quit(t_data *d_ptr)
 //todo: Temporaire
 void print_data(t_data *data)
 {
-    int i;
+    unsigned int i;
 
     printf("===== Simulation Data =====\n");
     printf("Number of philosophers: %d\n", data->count);
@@ -60,9 +60,9 @@ int main(int argc, char const *argv[])
 	t_data	data;
 
 	if (argc < 5 || argc > 6)
-		return (write(2, ERROR_ARG_MSG, 160), 1);
+		return (write(2, ERR_ARG_NB, 160), 1);	
 	if (init_data(&data, argc - 1, argv + 1))
-		return (1);
+		return (write(2, ERR_INVALID_ARG, 126), 1);
 	print_data(&data);
 	_free_for_quit(&data);
 	return (0);

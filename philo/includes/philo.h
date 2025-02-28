@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/02/26 16:44:33 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/02/28 17:47:00 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,12 @@
 # include <pthread.h>
 # include <stdbool.h>
 
-# define ERROR_ARG_MSG "Error: Wrong number of arguments. Usage: ./philo \
+# define ERR_ARG_NB "Error: Wrong number of arguments. Usage: ./philo \
 <number_of_philosophers <time_to_die> <time_to_eat> <time_to_sleep> \
 [number_of_times_each_philosopher_must_eat]"
+
+# define ERR_INVALID_ARG "Error: Wrong arguments, each one should fit in an \
+unsigned int (except the last one [optional one] that need to fit in a int)\n"
 
 typedef enum e_paction
 {
@@ -27,7 +30,6 @@ typedef enum e_paction
 	ACT_SLEEP,
 	ACT_THINK,
 	ACT_DIE,
-	ACT_SIZE
 }	t_paction;
 
 typedef struct s_philo
@@ -39,14 +41,15 @@ typedef struct s_philo
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 	struct s_data	*data;
+	t_paction		state;
 }	t_philo;
 
 typedef struct s_data
 {
-	int 	count;
-	int			 	time_to_die;
-	int			 	time_to_eat;
-	int			 	time_to_sleep;
+	unsigned int 	count;
+	unsigned int	time_to_die;
+	unsigned int	time_to_eat;
+	unsigned int	time_to_sleep;
 	int			 	must_eat_count;
 	long			start_time;
 	bool		 	sim_end;
@@ -55,14 +58,14 @@ typedef struct s_data
 	t_philo			*philos;
 }	t_data;
 
-//* Parse
-int	ft_satoi(char const *nptr, int *error);
+// init
+int		init_data(t_data *d_ptr, int ac, char const *av[]);
 
-//* Init
-int	init_data(t_data *d_ptr, int ac, char const *av[]);
+// routine
+void	philo_life(t_philo *phi)
 
-//* Utils
+// utils
 long	date_now();
-void	philog(t_paction act, int id);
+void	philog(t_philo phi);
 
 #endif
