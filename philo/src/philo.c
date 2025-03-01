@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/02/28 18:35:28 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/01 15:53:32 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ void	destroy_data(t_data *d_ptr)
 {
 	size_t	i;
 
-	//todo manage philos threads
 	free(d_ptr->philos);
 	i = 0;
 	while (i < d_ptr->count)
@@ -57,7 +56,31 @@ void print_data(t_data *data)
 
 void	monitoring(t_data *data)
 {
+	t_philo	died;
+	size_t	i;
+	bool	have_all_eat;
 
+	while (!data->sim_end)
+	{
+		i = 0;
+		have_all_eat = true;
+		while (i < data->count)
+		{
+			if (data->philos[i].meals_eaten < data->must_eat_count)
+				have_all_eat = false;
+			if (date_now() - data->start_time >= data->time_to_die)
+			{
+				died = data->philos[i];
+				died.state = ACT_DIE;
+				philog(died);
+				data->sim_end = true;
+				break ;
+			}
+			i++;
+		}
+		data->sim_end = have_all_eat;
+		usleep(MONITOR_DELAY);
+	}
 }
 
 int main(int argc, char const *argv[])
@@ -71,8 +94,9 @@ int main(int argc, char const *argv[])
 	if (init_data(&data, argc - 1, argv + 1))
 		return (write(2, ERR_INVALID_ARG, 126), 1);
 	pthread_create(&monitor, NULL, monitoring, &data);
-	while (data.count--)
-		pthread_join(data.philos[data.count].thread, NULL);
+	i = 0;
+	while (i < data.count)
+		pthread_join(data.philos[i++].thread, NULL);
 	pthread_join(monitor, NULL);
 	destroy_data(&data);
 	return (0);

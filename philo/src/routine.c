@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/28 15:32:18 by sliziard          #+#    #+#             */
-/*   Updated: 2025/02/28 18:29:03 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/01 15:40:34 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,34 +40,6 @@ static void	_think(t_philo *phi)
 {
 	phi->state = ACT_THINK;
 	philog(*phi);
-}
-
-static void	_check_death(t_philo *phi)
-{
-	size_t	i;
-	bool	have_all_eat;
-
-	if (date_now() - phi->data->start_time >= phi->data->time_to_die)
-	{
-		phi->state = ACT_DIE;
-		philog(*phi);
-		phi->data->sim_end = true;
-	}
-	if (phi->data->must_eat_count == -1)
-		return ;
-	i = 0;
-	have_all_eat = true;
-	while (i < phi->data->count)
-	{
-		if (phi->data->philos[i].meals_eaten < phi->data->must_eat_count)
-		{
-			have_all_eat = false;
-			break ;
-		}
-		i++;
-	}
-	if (have_all_eat)
-		phi->data->sim_end = true;
 }
 
 void	philo_life(t_philo *phi)
