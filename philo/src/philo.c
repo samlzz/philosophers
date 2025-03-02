@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/02 18:56:05 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/02 19:47:29 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,7 @@ int main(int argc, char const *argv[])
 {
 	t_data		data;
 	pthread_t	monitor;
+	size_t		i;
 
 	if (argc < 5 || argc > 6)
 		return (write(2, ERR_ARG_NB, 160), 1);
@@ -79,6 +80,9 @@ int main(int argc, char const *argv[])
 		return (write(2, ERR_INVALID_ARG, 126), 1);
 	pthread_create(&monitor, NULL, &monitoring, (void *)&data);
 	pthread_join(monitor, NULL);
+	i = 0;
+	while (i < data.count)
+		pthread_join(data.philos[i++].thread, NULL);
 	_destroy_data(&data);
 	return (0);
 }

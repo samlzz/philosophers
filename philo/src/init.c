@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:47:49 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/02 18:32:54 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/02 19:47:35 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,6 @@ void	init_philos(t_data *d_ptr, void *(*start_routine) (void *))
 		d_ptr->philos[i].data = d_ptr;
 		pthread_create(&d_ptr->philos[i].thread, NULL, start_routine, \
 			d_ptr->philos + i);
-		pthread_detach(d_ptr->philos[i].thread);
 		i++;
 	}
 }
