@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:47:49 by sliziard          #+#    #+#             */
-/*   Updated: 2025/02/28 18:32:22 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/02 18:32:54 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ pthread_mutex_t	*init_forks(size_t count)
 	return (forks);
 }
 
-void	init_philos(t_data *d_ptr, void *(start_routine(void *)))
+void	init_philos(t_data *d_ptr, void *(*start_routine) (void *))
 {
 	size_t	i;
 
@@ -69,8 +69,9 @@ void	init_philos(t_data *d_ptr, void *(start_routine(void *)))
 		d_ptr->philos[i].left_fork = d_ptr->forks + i;
 		d_ptr->philos[i].right_fork = d_ptr->forks + ((i + 1) % d_ptr->count);
 		d_ptr->philos[i].data = d_ptr;
-		pthread_create(d_ptr->philos[i].thread, NULL, start_routine, \
-			d_ptr->philos +i);
+		pthread_create(&d_ptr->philos[i].thread, NULL, start_routine, \
+			d_ptr->philos + i);
+		pthread_detach(d_ptr->philos[i].thread);
 		i++;
 	}
 }
@@ -116,5 +117,5 @@ int	init_data(t_data *d_ptr, int ac, char const *av[])
 	if (!d_ptr->forks)
 		return (free(d_ptr->philos), 1);
 	pthread_mutex_init(&d_ptr->print_mutex, NULL);
-	return (init_philos(d_ptr, philo_life), 0);
+	return (init_philos(d_ptr, &philo_life), 0);
 }
