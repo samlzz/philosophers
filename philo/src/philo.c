@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/01 15:53:32 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/02 18:56:05 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,48 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void	destroy_data(t_data *d_ptr)
+static void	_check_end(t_data *data)
+{
+	size_t	i;
+	bool	have_all_eat;
+
+	have_all_eat = true;
+	i = 0;
+	while (i < data->count)
+	{
+		if (data->philos[i].meals_eaten < data->must_eat_count)
+			have_all_eat = false;
+		if (date_now() - data->philos[i].last_meal_time >= data->time_to_die)
+		{
+			philog(data->philos[i], ACT_DIE);
+			data->sim_end = true;
+			break ;
+		}
+		i++;
+	}
+	data->sim_end = have_all_eat;
+}
+
+void	*monitoring(void *param)
+{
+	t_data	*data;
+
+	data = (t_data *)param;
+	if (data->count < 2)
+	{
+		if (data->philos)
+			philog(*data->philos, ACT_DIE);
+		data->sim_end = true;
+	}
+	while (!data->sim_end)
+	{
+		_check_end(data);
+		usleep(MONITOR_DELAY);
+	}
+	return (NULL);
+}
+
+static void	_destroy_data(t_data *d_ptr)
 {
 	size_t	i;
 
@@ -27,77 +68,17 @@ void	destroy_data(t_data *d_ptr)
 	pthread_mutex_destroy(&d_ptr->print_mutex);
 }
 
-//todo: Temporaire
-void print_data(t_data *data)
-{
-    unsigned int i;
-
-    printf("===== Simulation Data =====\n");
-    printf("Number of philosophers: %d\n", data->count);
-    printf("Time to die: %d ms\n", data->time_to_die);
-    printf("Time to eat: %d ms\n", data->time_to_eat);
-    printf("Time to sleep: %d ms\n", data->time_to_sleep);
-    printf("Meals required: %d\n", data->must_eat_count);
-    printf("Start time: %ld ms\n", data->start_time);
-    printf("Simulation end flag: %d\n", data->sim_end);
-    printf("\n");
-
-    printf("===== Philosophers Data =====\n");
-    for (i = 0; i < data->count; i++)
-    {
-        printf("Philosopher %d:\n", data->philos[i].id);
-        printf("  - Meals eaten: %d\n", data->philos[i].meals_eaten);
-        printf("  - Last meal time: %ld ms\n", data->philos[i].last_meal_time);
-        printf("  - Left fork address: %p\n", (void *)data->philos[i].left_fork);
-        printf("  - Right fork address: %p\n", (void *)data->philos[i].right_fork);
-        printf("\n");
-    }
-}
-
-void	monitoring(t_data *data)
-{
-	t_philo	died;
-	size_t	i;
-	bool	have_all_eat;
-
-	while (!data->sim_end)
-	{
-		i = 0;
-		have_all_eat = true;
-		while (i < data->count)
-		{
-			if (data->philos[i].meals_eaten < data->must_eat_count)
-				have_all_eat = false;
-			if (date_now() - data->start_time >= data->time_to_die)
-			{
-				died = data->philos[i];
-				died.state = ACT_DIE;
-				philog(died);
-				data->sim_end = true;
-				break ;
-			}
-			i++;
-		}
-		data->sim_end = have_all_eat;
-		usleep(MONITOR_DELAY);
-	}
-}
-
 int main(int argc, char const *argv[])
 {
 	t_data		data;
 	pthread_t	monitor;
-	size_t		i;
 
 	if (argc < 5 || argc > 6)
-		return (write(2, ERR_ARG_NB, 160), 1);	
+		return (write(2, ERR_ARG_NB, 160), 1);
 	if (init_data(&data, argc - 1, argv + 1))
 		return (write(2, ERR_INVALID_ARG, 126), 1);
-	pthread_create(&monitor, NULL, monitoring, &data);
-	i = 0;
-	while (i < data.count)
-		pthread_join(data.philos[i++].thread, NULL);
+	pthread_create(&monitor, NULL, &monitoring, (void *)&data);
 	pthread_join(monitor, NULL);
-	destroy_data(&data);
+	_destroy_data(&data);
 	return (0);
 }
