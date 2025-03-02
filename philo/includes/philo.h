@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/01 15:50:18 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/02 18:58:27 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 # define ERR_INVALID_ARG "Error: Wrong arguments, each one should fit in an \
 unsigned int (except the last one [optional one] that need to fit in a int)\n"
 
-# define MONITOR_DELAY 10
+# define MONITOR_DELAY 10000 //? 10 milliseconds
 
 typedef enum e_paction
 {
@@ -43,7 +43,6 @@ typedef struct s_philo
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 	struct s_data	*data;
-	t_paction		state;
 }	t_philo;
 
 typedef struct s_data
@@ -64,10 +63,10 @@ typedef struct s_data
 int		init_data(t_data *d_ptr, int ac, char const *av[]);
 
 // routine
-void	philo_life(t_philo *phi)
+void	*philo_life(void *param);
 
 // utils
 long	date_now();
-void	philog(t_philo phi);
+void	philog(t_philo phi, t_paction state);
 
 #endif
