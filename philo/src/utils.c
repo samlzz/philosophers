@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:41:35 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/04 20:56:21 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/04 22:09:20 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,13 @@ int	ft_usleep(size_t milliseconds)
 
 	start = date_now();
 	while ((date_now() - start) < milliseconds)
-		usleep(500);
+		usleep(USLEEP_INTERVAL);
 	return (0);
 }
 
 bool	philog(t_philo phi, t_paction state)
 {
+	long	timestamp;
 	char	*strs[ACT_DIE + 1];
 
 	strs[ACT_FORK] = "has taken a fork";
@@ -43,11 +44,12 @@ bool	philog(t_philo phi, t_paction state)
 	strs[ACT_SLEEP] = "is sleeping";
 	strs[ACT_THINK] = "is thinking";
 	strs[ACT_DIE] = "is died";
+	timestamp = date_now();
 	if (state != ACT_DIE && \
-		date_now() - phi.last_meal_time >= phi.data->time_to_die)
+		timestamp - phi.last_meal_time >= phi.data->time_to_die)
 		return (1);
 	pthread_mutex_lock(&phi.data->print_mutex);
-	printf("[%ld] %d %s\n", date_now(), phi.id, strs[state]);
+	printf("[%ld] %d %s\n", timestamp, phi.id, strs[state]);
 	pthread_mutex_unlock(&phi.data->print_mutex);
 	return (0);
 }

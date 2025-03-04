@@ -6,14 +6,12 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/04 21:16:00 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/04 22:01:52 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 #include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 static void	_check_end(t_data *data)
 {
@@ -38,7 +36,8 @@ static void	_check_end(t_data *data)
 		}
 		i++;
 	}
-	set_sim_end(data, have_all_eat);
+	if (have_all_eat)
+		set_sim_end(data, true);
 }
 
 void	*monitoring(void *param)

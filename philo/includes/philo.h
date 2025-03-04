@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/04 20:53:05 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/04 22:09:16 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #  define PHILO_MAX 200
 # endif
 
+# define USLEEP_INTERVAL 500
 # define MONITOR_DELAY 10
 
 # define ERR_ARG_NB "Error: Wrong number of arguments. Usage: ./philo \
