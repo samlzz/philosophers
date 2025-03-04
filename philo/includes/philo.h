@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/02 18:58:27 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/04 17:43:11 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 unsigned int (except the last one [optional one] that need to fit in a int)\n"
 
 # define MONITOR_DELAY 10000 //? 10 milliseconds
+# define PHILO_MAX 200
 
 typedef enum e_paction
 {
@@ -34,14 +35,17 @@ typedef enum e_paction
 	ACT_DIE,
 }	t_paction;
 
+typedef pthread_mutex_t	t_mutex;
+
 typedef struct s_philo
 {
 	int				id;
 	int				meals_eaten;
 	long			last_meal_time;
+	t_mutex			meal_mutex;
 	pthread_t		thread;
-	pthread_mutex_t	*left_fork;
-	pthread_mutex_t	*right_fork;
+	t_mutex			*left_fork;
+	t_mutex			*right_fork;
 	struct s_data	*data;
 }	t_philo;
 
@@ -54,19 +58,21 @@ typedef struct s_data
 	int			 	must_eat_count;
 	long			start_time;
 	bool		 	sim_end;
-	pthread_mutex_t	print_mutex;
-	pthread_mutex_t	*forks;
+	t_mutex			print_mutex;
+	t_mutex			*forks;
 	t_philo			*philos;
 }	t_data;
 
 // init
-int		init_data(t_data *d_ptr, int ac, char const *av[]);
+void			init_philo_and_forks(t_data *d_ptr, t_philo *philos, t_mutex *forks);
+int				init_data(t_data *d_ptr, int ac, char const *av[]);
 
 // routine
-void	*philo_life(void *param);
+void			*philo_life(void *param);
 
 // utils
-long	date_now();
-void	philog(t_philo phi, t_paction state);
+long			date_now();
+void			philog(t_philo phi, t_paction state);
+unsigned int	ascii_to_uint(const char *nptr, int *error);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/04 16:11:27 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/04 17:35:55 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,18 +19,22 @@ static void	_check_end(t_data *data)
 {
 	size_t	i;
 	bool	have_all_eat;
+	long	lst_meal;
 
 	have_all_eat = data->must_eat_count != -1;
 	i = 0;
 	while (i < data->count)
 	{
+		pthread_mutex_lock(&data->philos[i].meal_mutex);
 		if (data->philos[i].meals_eaten < data->must_eat_count)
 			have_all_eat = false;
-		if (date_now() - data->philos[i].last_meal_time >= data->time_to_die)
+		lst_meal = data->philos[i].last_meal_time;
+		pthread_mutex_unlock(&data->philos[i].meal_mutex);
+		if (date_now() - lst_meal >= data->time_to_die)
 		{
 			philog(data->philos[i], ACT_DIE);
 			data->sim_end = true;
-			break ;
+			return ;
 		}
 		i++;
 	}
@@ -60,17 +64,20 @@ static void	_destroy_data(t_data *d_ptr)
 {
 	size_t	i;
 
-	free(d_ptr->philos);
 	i = 0;
 	while (i < d_ptr->count)
+	{
+		pthread_mutex_destroy(&d_ptr->philos[i].meal_mutex);
 		pthread_mutex_destroy(d_ptr->forks + i++);
-	free(d_ptr->forks);
+	}
 	pthread_mutex_destroy(&d_ptr->print_mutex);
 }
 
 int main(int argc, char const *argv[])
 {
 	t_data		data;
+	t_philo		philos[PHILO_MAX];
+	t_mutex		forks[PHILO_MAX];
 	pthread_t	monitor;
 	size_t		i;
 
@@ -78,6 +85,7 @@ int main(int argc, char const *argv[])
 		return (write(2, ERR_ARG_NB, 160), 1);
 	if (init_data(&data, argc - 1, argv + 1))
 		return (write(2, ERR_INVALID_ARG, 126), 1);
+	init_philo_and_forks(&data, philos, forks);
 	pthread_create(&monitor, NULL, &monitoring, (void *)&data);
 	pthread_join(monitor, NULL);
 	i = 0;
