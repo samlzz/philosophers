@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/04 17:53:23 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/04 20:30:16 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,18 @@
 # include <pthread.h>
 # include <stdbool.h>
 
+# ifndef PHILO_MAX
+#  define PHILO_MAX 200
+# endif
+
+# define MONITOR_DELAY 10
+
 # define ERR_ARG_NB "Error: Wrong number of arguments. Usage: ./philo \
 <number_of_philosophers <time_to_die> <time_to_eat> <time_to_sleep> \
 [number_of_times_each_philosopher_must_eat]"
-
 # define ERR_INVALID_ARG "Error: Wrong arguments, each one should fit in an \
 unsigned int (except the last one [optional one] that need to fit in a int)\n"
 
-# define MONITOR_DELAY 10
-# define PHILO_MAX 200
 
 typedef enum e_paction
 {
@@ -57,7 +60,8 @@ typedef struct s_data
 	unsigned int	time_to_sleep;
 	int			 	must_eat_count;
 	long			start_time;
-	bool		 	sim_end;
+	bool		 	__sim_end;
+	t_mutex			end_mutex;
 	t_mutex			print_mutex;
 	t_mutex			*forks;
 	t_philo			*philos;
@@ -72,7 +76,9 @@ void			*philo_life(void *param);
 
 // utils
 long			date_now();
-void			philog(t_philo phi, t_paction state);
+bool			philog(t_philo phi, t_paction state);
 int				ft_usleep(size_t milliseconds);
+void			set_sim_end(t_data *d_ptr, bool value);
+bool			get_sim_end(t_data *d_ptr);
 
 #endif

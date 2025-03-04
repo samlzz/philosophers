@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/04 17:50:13 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/04 20:31:34 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,12 @@ static void	_check_end(t_data *data)
 		if (date_now() - lst_meal >= data->time_to_die)
 		{
 			philog(data->philos[i], ACT_DIE);
-			data->sim_end = true;
+			set_sim_end(data, true);
 			return ;
 		}
 		i++;
 	}
-	data->sim_end = have_all_eat;
+	set_sim_end(data, have_all_eat);
 }
 
 void	*monitoring(void *param)
@@ -50,9 +50,9 @@ void	*monitoring(void *param)
 	{
 		if (data->philos)
 			philog(*data->philos, ACT_DIE);
-		data->sim_end = true;
+		set_sim_end(data, true);
 	}
-	while (!data->sim_end)
+	while (!get_sim_end(data))
 	{
 		_check_end(data);
 		ft_usleep(MONITOR_DELAY);
@@ -71,6 +71,7 @@ static void	_destroy_data(t_data *d_ptr)
 		pthread_mutex_destroy(d_ptr->forks + i++);
 	}
 	pthread_mutex_destroy(&d_ptr->print_mutex);
+	pthread_mutex_destroy(&d_ptr->end_mutex);
 }
 
 int main(int argc, char const *argv[])

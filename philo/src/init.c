@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:47:49 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/04 17:49:18 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/04 19:31:13 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ int	init_data(t_data *d_ptr, int ac, char const *av[])
 	if (ac == 4)
 		d_ptr->must_eat_count = -1;
 	pthread_mutex_init(&d_ptr->print_mutex, NULL);
+	pthread_mutex_init(&d_ptr->end_mutex, NULL);
 	return (0);
 }
 
