@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/04 20:59:23 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/04 21:16:00 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,9 @@ void	*monitoring(void *param)
 	data = (t_data *)param;
 	if (data->count < 2)
 	{
+		set_sim_end(data, true);
 		if (data->philos)
 			philog(*data->philos, ACT_DIE);
-		set_sim_end(data, true);
 	}
 	while (!get_sim_end(data))
 	{
