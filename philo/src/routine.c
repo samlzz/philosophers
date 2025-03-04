@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/28 15:32:18 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/04 22:31:59 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/04 22:37:12 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,13 +51,13 @@ static bool	_sleep(t_philo *phi)
 
 static bool	_think(t_philo *phi)
 {
-	bool exit;
+	bool	exit;
 
-    exit = philog(*phi, ACT_THINK);
-    if (exit)
-        return (exit);
-    usleep(50);
-    return (0);
+	exit = philog(*phi, ACT_THINK);
+	if (exit)
+		return (exit);
+	usleep(50);
+	return (0);
 }
 
 void	*philo_life(void *param)
