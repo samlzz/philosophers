@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/25 15:47:49 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/04 19:31:13 by sliziard         ###   ########.fr       */
+/*   Created: 2025/03/04 20:54:03 by sliziard          #+#    #+#             */
+/*   Updated: 2025/03/04 20:55:30 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,45 +15,44 @@
 #include <string.h>
 #include <limits.h>
 
-unsigned int ascii_to_uint(const char *nptr, int *error)
+unsigned int	ascii_to_uint(const char *nptr, int *error)
 {
-    unsigned long r;
+	unsigned long	r;
 
-    r = 0;
-    *error = 0;
-    if (!nptr || !*nptr)
-    {
-        *error = 1;
-        return 0;
-    }
-    while (*nptr >= '0' && *nptr <= '9')
-    {
-        r = (r * 10) + (*nptr - '0');
-        if (r > UINT_MAX)
-        {
-            *error = 1;
-            return (UINT_MAX);
-        }
-        nptr++;
-    }
-
-    if (*nptr)
-        *error = 1;
-    return (unsigned int)r;
+	r = 0;
+	*error = 0;
+	if (!nptr || !*nptr)
+	{
+		*error = 1;
+		return (0);
+	}
+	while (*nptr >= '0' && *nptr <= '9')
+	{
+		r = (r * 10) + (*nptr - '0');
+		if (r > UINT_MAX)
+		{
+			*error = 1;
+			return (UINT_MAX);
+		}
+		nptr++;
+	}
+	if (*nptr)
+		*error = 1;
+	return ((unsigned int)r);
 }
 
-static int	_set_nb_field(char const *nb, int *signed_field, unsigned int *field)
+static int	_set_nb_field(char const *nb, int *sign_field, unsigned int *field)
 {
 	int				has_err;
 	unsigned int	value;
 
 	has_err = 0;
 	value = ascii_to_uint(nb, &has_err);
-	if (signed_field)
+	if (sign_field)
 	{
 		if (value > INT_MAX)
 			return (1);
-		*signed_field = (int)value;
+		*sign_field = (int)value;
 	}
 	else
 		*field = value;

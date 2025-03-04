@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:41:35 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/04 20:32:57 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/04 20:56:21 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,10 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-long	date_now()
+long	date_now(void)
 {
-	struct timeval tv;
-	
+	struct timeval	tv;
+
 	if (gettimeofday(&tv, NULL) == -1)
 		write(2, "gettimeofday() error\n", 22);
 	return (tv.tv_sec * 1000L + tv.tv_usec / 1000);

@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/04 20:31:34 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/04 20:55:49 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,13 +74,12 @@ static void	_destroy_data(t_data *d_ptr)
 	pthread_mutex_destroy(&d_ptr->end_mutex);
 }
 
-int main(int argc, char const *argv[])
+int	main(int argc, char const *argv[])
 {
 	t_data		data;
 	t_philo		philos[PHILO_MAX];
 	t_mutex		forks[PHILO_MAX];
 	pthread_t	monitor;
-	size_t		i;
 
 	if (argc < 5 || argc > 6)
 		return (write(2, ERR_ARG_NB, 160), 1);
@@ -89,9 +88,8 @@ int main(int argc, char const *argv[])
 	init_philo_and_forks(&data, philos, forks);
 	pthread_create(&monitor, NULL, &monitoring, (void *)&data);
 	pthread_join(monitor, NULL);
-	i = 0;
-	while (i < data.count)
-		pthread_join(data.philos[i++].thread, NULL);
+	while (--data.count)
+		pthread_join(data.philos[data.count].thread, NULL);
 	_destroy_data(&data);
 	return (0);
 }
