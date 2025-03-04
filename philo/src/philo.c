@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/02 19:47:29 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/02 20:01:07 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,8 @@ static void	_check_end(t_data *data)
 	i = 0;
 	while (i < data->count)
 	{
-		if (data->philos[i].meals_eaten < data->must_eat_count)
+		if (data->must_eat_count != -1 && \
+			data->philos[i].meals_eaten < data->must_eat_count)
 			have_all_eat = false;
 		if (date_now() - data->philos[i].last_meal_time >= data->time_to_die)
 		{
