@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/04 20:55:49 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/04 20:59:23 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,8 +88,8 @@ int	main(int argc, char const *argv[])
 	init_philo_and_forks(&data, philos, forks);
 	pthread_create(&monitor, NULL, &monitoring, (void *)&data);
 	pthread_join(monitor, NULL);
-	while (--data.count)
-		pthread_join(data.philos[data.count].thread, NULL);
+	while (data.count)
+		pthread_join(data.philos[--data.count].thread, NULL);
 	_destroy_data(&data);
 	return (0);
 }

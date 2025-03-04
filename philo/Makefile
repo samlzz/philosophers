@@ -10,7 +10,7 @@ LIB_DIRS =
 LIB_FILES = pthread
 
 CC = gcc
-CFLAGS := -Wall -Wextra -Werror -MMD
+CFLAGS := -Wall -Wextra -Werror -MMD -g
 RM = rm -f
 MD = mkdir -p
 AR = ar rcs
