@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/28 15:32:18 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/04 17:43:23 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/04 17:51:08 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ static void	_eat(t_philo *phi)
 	phi->last_meal_time = date_now();
 	pthread_mutex_unlock(&phi->meal_mutex);
 	phi->meals_eaten++;
-	usleep(phi->data->time_to_eat * 1000);
+	ft_usleep(phi->data->time_to_eat);
 	pthread_mutex_unlock(phi->left_fork);
 	pthread_mutex_unlock(phi->right_fork);
 }
@@ -40,7 +40,7 @@ static void	_eat(t_philo *phi)
 static void	_sleep(t_philo *phi)
 {
 	philog(*phi, ACT_SLEEP);
-	usleep(phi->data->time_to_sleep * 1000);
+	ft_usleep(phi->data->time_to_sleep);
 }
 
 static void	_think(t_philo *phi)

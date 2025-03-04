@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/04 17:35:55 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/04 17:50:13 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ void	*monitoring(void *param)
 	while (!data->sim_end)
 	{
 		_check_end(data);
-		usleep(MONITOR_DELAY);
+		ft_usleep(MONITOR_DELAY);
 	}
 	return (NULL);
 }

@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/04 17:43:11 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/04 17:53:23 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 # define ERR_INVALID_ARG "Error: Wrong arguments, each one should fit in an \
 unsigned int (except the last one [optional one] that need to fit in a int)\n"
 
-# define MONITOR_DELAY 10000 //? 10 milliseconds
+# define MONITOR_DELAY 10
 # define PHILO_MAX 200
 
 typedef enum e_paction
@@ -73,6 +73,6 @@ void			*philo_life(void *param);
 // utils
 long			date_now();
 void			philog(t_philo phi, t_paction state);
-unsigned int	ascii_to_uint(const char *nptr, int *error);
+int				ft_usleep(size_t milliseconds);
 
 #endif

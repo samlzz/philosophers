@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:47:49 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/04 17:34:14 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/04 17:49:18 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,33 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+
+unsigned int ascii_to_uint(const char *nptr, int *error)
+{
+    unsigned long r;
+
+    r = 0;
+    *error = 0;
+    if (!nptr || !*nptr)
+    {
+        *error = 1;
+        return 0;
+    }
+    while (*nptr >= '0' && *nptr <= '9')
+    {
+        r = (r * 10) + (*nptr - '0');
+        if (r > UINT_MAX)
+        {
+            *error = 1;
+            return (UINT_MAX);
+        }
+        nptr++;
+    }
+
+    if (*nptr)
+        *error = 1;
+    return (unsigned int)r;
+}
 
 static int	_set_nb_field(char const *nb, int *signed_field, unsigned int *field)
 {

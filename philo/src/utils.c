@@ -6,48 +6,32 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:41:35 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/04 17:10:37 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/04 17:48:58 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+#include <unistd.h>
 #include <stdio.h>
 #include <sys/time.h>
-#include <limits.h>
-
-unsigned int ascii_to_uint(const char *nptr, int *error)
-{
-    unsigned long r;
-
-    r = 0;
-    *error = 0;
-    if (!nptr || !*nptr)
-    {
-        *error = 1;
-        return 0;
-    }
-    while (*nptr >= '0' && *nptr <= '9')
-    {
-        r = (r * 10) + (*nptr - '0');
-        if (r > UINT_MAX)
-        {
-            *error = 1;
-            return (UINT_MAX);
-        }
-        nptr++;
-    }
-
-    if (*nptr)
-        *error = 1;
-    return (unsigned int)r;
-}
 
 long	date_now()
 {
 	struct timeval tv;
 	
-	gettimeofday(&tv, NULL);
+	if (gettimeofday(&tv, NULL) == -1)
+		write(2, "gettimeofday() error\n", 22);
 	return (tv.tv_sec * 1000L + tv.tv_usec / 1000);
+}
+
+int	ft_usleep(size_t milliseconds)
+{
+	size_t	start;
+
+	start = date_now();
+	while ((date_now() - start) < milliseconds)
+		usleep(500);
+	return (0);
 }
 
 void	philog(t_philo phi, t_paction state)
