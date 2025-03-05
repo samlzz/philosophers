@@ -6,16 +6,13 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/05 11:39:59 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/05 13:29:35 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 #include <unistd.h>
-
-#ifdef ALLOC_MODE
-# include <stdlib.h>
-#endif
+#include <stdlib.h>
 
 static void	_check_end(t_data *data)
 {
@@ -63,7 +60,7 @@ void	*monitoring(void *param)
 	return (NULL);
 }
 
-static void	_destroy_data(t_data *d_ptr)
+static void	_destroy_data(t_data *d_ptr, bool alloc_mode)
 {
 	size_t	i;
 
@@ -75,12 +72,11 @@ static void	_destroy_data(t_data *d_ptr)
 	}
 	pthread_mutex_destroy(&d_ptr->print_mutex);
 	pthread_mutex_destroy(&d_ptr->end_mutex);
-	#ifdef ALLOC_MODE
-
-	free(d_ptr->philos);
-	free(d_ptr->forks);
-	#endif
-
+	if (alloc_mode)
+	{
+		free(d_ptr->philos);
+		free(d_ptr->forks);
+	}
 }
 
 #ifndef ALLOC_MODE
@@ -101,7 +97,7 @@ int	main(int argc, char const *argv[])
 	pthread_join(monitor, NULL);
 	while (data.count)
 		pthread_join(data.philos[--data.count].thread, NULL);
-	_destroy_data(&data);
+	_destroy_data(&data, false);
 	return (0);
 }
 
@@ -133,7 +129,7 @@ int	main(int argc, char const *argv[])
 	pthread_join(monitor, NULL);
 	while (data.count)
 		pthread_join(data.philos[--data.count].thread, NULL);
-	return (_destroy_data(&data), 0);
+	return (_destroy_data(&data, true), 0);
 }
 
 #endif
