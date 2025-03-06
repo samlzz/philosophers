@@ -5,7 +5,7 @@ NAME = philo_bonus
 SRC_DIR = src/
 OBJ_DIR = build/
 
-INCL_DIR = includes
+INCL_DIR = include
 LIB_DIRS =
 LIB_FILES = pthread rt
 
@@ -17,6 +17,7 @@ AR = ar rcs
 
 C_FILES =	init.c			\
 			philo_bonus.c	\
+			child.c			\
 			utils.c
 
 #* Colors

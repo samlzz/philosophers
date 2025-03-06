@@ -6,15 +6,15 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/05 14:29:21 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/06 17:08:33 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_BONUS_H
 # define PHILO_BONUS_H
 
-# include <pthread.h>
 # include <semaphore.h>
+# include <unistd.h>
 # include <stdbool.h>
 
 # define USLEEP_INTERVAL 500
@@ -27,6 +27,10 @@
 unsigned int (except the last one [optional one] that need to fit in a int)\n"
 # define ERR_ALLOC "Error: Allocation failed\n"
 
+# define SEM_PRINT	"/print_sem"
+# define SEM_END	"/end_sem"
+# define SEM_FORKS	"/forks_sem"
+
 typedef enum e_paction
 {
 	ACT_FORK,
@@ -36,20 +40,6 @@ typedef enum e_paction
 	ACT_DIE,
 }	t_paction;
 
-typedef pthread_mutex_t	t_mutex;
-
-typedef struct s_philo
-{
-	int				id;
-	int				meals_eaten;
-	long			last_meal_time;
-	t_mutex			meal_mutex;
-	pthread_t		thread;
-	t_mutex			*left_fork;
-	t_mutex			*right_fork;
-	struct s_data	*data;
-}	t_philo;
-
 typedef struct s_data
 {
 	unsigned int	count;
@@ -58,18 +48,29 @@ typedef struct s_data
 	unsigned int	time_to_sleep;
 	int				must_eat_count;
 	long			start_time;
-	int				__sim_end : 1;
-	t_mutex			end_mutex;
-	t_mutex			print_mutex;
-	t_mutex			*forks;
-	t_philo			*philos;
 }	t_data;
 
+typedef struct s_philo {
+	unsigned int	id;
+	unsigned int	meals;
+	long			lst_meal_time;
+	sem_t			*sem_print;
+	sem_t			*sem_end;
+	sem_t			*forks;
+}	t_philo;
+
+
+// init
+int		init_data(t_data *d_ptr, int ac, char const *av[]);
+pid_t	*init_childs(t_data data);
+int		open_semaphores(t_philo *owner, size_t count);
+
+// childs
+int		children_process(unsigned int id, t_data data);
+
 // utils
-long			date_now(void);
-bool			philog(t_philo phi, t_paction state);
-int				ft_usleep(size_t milliseconds);
-void			set_sim_end(t_data *d_ptr, bool value);
-bool			get_sim_end(t_data *d_ptr);
+long	date_now(void);
+void	philog(t_philo owner, t_paction state);
+int		ft_usleep(size_t milliseconds);
 
 #endif
