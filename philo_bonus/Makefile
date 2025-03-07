@@ -17,7 +17,7 @@ AR = ar rcs
 
 C_FILES =	init_bonus.c	\
 			philo_bonus.c	\
-			child.c			\
+			child_bonus.c	\
 			utils_bonus.c
 
 #* Colors
