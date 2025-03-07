@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/07 14:25:37 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/07 14:35:07 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,17 +56,6 @@ typedef enum e_paction
 
 typedef pthread_mutex_t	t_mutex;
 
-/**
- * * Philosopher structure size
- * id:				int (2 | 4)
- * meals_eaten:		int (2 | 4)
- * last_meal_time:	long (8)
- * thread:			pthread_t (8)
- * left_fork:		ptr (4 | 8)
- * right_fork:		ptr (4 | 8)
- * data:			ptr (4 | 8)
- * * = 32 | 48 bytes
- */
 typedef struct s_philo
 {
 	int				id;
@@ -79,17 +68,6 @@ typedef struct s_philo
 	struct s_data	*data;
 }	t_philo;
 
-/**
- * * Data structure size
- * ? One mutex ~= 40 | 56 bytes
- * unsigned int:	(2 | 4) * 3
- * int:				(2 | 4) * 1
- * __sim_end:		(1)
- * start_time:		(8)
- * t_mutex:			(40 | 56) * 2
- * ptr:				(4 | 8) * 2
- * * = 105 | 153 bytes 
- */
 typedef struct s_data
 {
 	unsigned int	count;
