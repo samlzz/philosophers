@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/05 11:40:19 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/07 14:25:37 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,24 +16,20 @@
 # include <pthread.h>
 # include <stdbool.h>
 
-/**
- * * Whe have `data` that countains n-count of:
- * ?-	t_philo (32 | 48)
- * ?-	t_mutex (40 | 56)
- * 
- * The stack is allocated (generaly) with 8 Mo (8 388 608 bytes)
- * ? Arch 32-bytes
- * 105 + count * (32 + 40) bytes
- * * = 116510 PHILO_MAX
- * ? Arch 64-bytes
- * 153 + count * (48 + 56) bytes
- * * = 80643 PHILO_MAX
- */
+# ifndef STACK_SIZE
+#  define STACK_SIZE 8388608
+# endif
+
 # ifndef ALLOC_MODE
 #  ifndef PHILO_MAX
 #   define PHILO_MAX 200
 #  else
-#   if PHILO_MAX > 80000
+#   if !defined MUTEX_SIZE || !defined PHILO_SIZE || !defined DATA_SIZE
+#    error "The size of mutex, philo or data are unknown, please use makefile"
+#   endif
+#   if PHILO_MAX > ((STACK_SIZE - DATA_SIZE) / (PHILO_SIZE + MUTEX_SIZE))
+#    warning the PHILO_MAX provided is too large, use heap instead of stack \
+(define ALLOC_MODE to delete this warning)
 #    define ALLOC_MODE
 #   endif
 #  endif

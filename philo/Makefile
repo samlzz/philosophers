@@ -9,7 +9,7 @@ INCL_DIR = includes
 LIB_DIRS =
 LIB_FILES = pthread
 
-CC = gcc
+CC = cc
 CFLAGS := -Wall -Wextra -Werror -MMD -g
 RM = rm -f
 MD = mkdir -p
@@ -52,6 +52,17 @@ ifeq ($(suffix $(NAME)), .a)
 else
 	LINK_CMD = $(CC) $(OBJS) -o $(NAME) $(CFLAGS) $(LIB_FLAGS)
 endif
+
+#? get some size for compilation (see philo.h)
+STACK_SIZE := $(shell echo $$(($(shell ulimit -s) * 1024)))
+MUTEX_SIZE := $(shell echo '#include <pthread.h>\n#include <stdio.h>\nint main() { printf("%zu", sizeof(pthread_mutex_t)); return 0; }' | cc -xc - -o /tmp/get_size && /tmp/get_size)
+PHILO_SIZE := $(shell echo '#include "includes/philo.h"\n#include <stdio.h>\nint main() { printf("%zu", sizeof(struct s_philo)); return 0; }' | cc -xc - -Iincludes -DALLOC_MODE -o /tmp/get_size && /tmp/get_size)
+DATA_SIZE := $(shell echo '#include "includes/philo.h"\n#include <stdio.h>\nint main() { printf("%zu", sizeof(struct s_data)); return 0; }' | cc -xc - -Iincludes -DALLOC_MODE -o /tmp/get_size && /tmp/get_size)
+
+CFLAGS +=  -DSTACK_SIZE=$(STACK_SIZE) \
+			-DMUTEX_SIZE=$(MUTEX_SIZE) \
+			-DPHILO_SIZE=$(PHILO_SIZE) \
+			-DDATA_SIZE=$(DATA_SIZE)
 
 #* Rules
 

@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/06 12:01:27 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/07 14:32:10 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,11 +108,11 @@ int	main(int argc, char const *argv[])
 		return (write(2, ERR_ARG_NB, 160), 1);
 	if (init_data(&data, argc - 1, argv + 1))
 		return (write(2, ERR_INVALID_ARG, 126), 1);
-	philos = malloc(count * sizeof(t_philo));
+	philos = malloc(data.count * sizeof(t_philo));
 	if (!philos)
 		return (write(2, ERR_ALLOC, 25), 1);
-	forks = malloc(count * sizeof(t_mutex));
-	if (!fork)
+	forks = malloc(data.count * sizeof(t_mutex));
+	if (!forks)
 	{
 		free(philos);
 		write(2, ERR_ALLOC, 25);
