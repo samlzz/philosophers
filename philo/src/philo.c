@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/07 14:32:10 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/07 17:30:17 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ int	main(int argc, char const *argv[])
 	if (argc < 5 || argc > 6)
 		return (write(2, ERR_ARG_NB, 160), 1);
 	if (init_data(&data, argc - 1, argv + 1))
-		return (write(2, ERR_INVALID_ARG, 126), 1);
+		return (write(2, ERR_INVALID_ARG, 104), 1);
 	init_philo_and_forks(&data, philos, forks);
 	pthread_create(&monitor, NULL, &monitoring, (void *)&data);
 	pthread_join(monitor, NULL);
@@ -107,7 +107,7 @@ int	main(int argc, char const *argv[])
 	if (argc < 5 || argc > 6)
 		return (write(2, ERR_ARG_NB, 160), 1);
 	if (init_data(&data, argc - 1, argv + 1))
-		return (write(2, ERR_INVALID_ARG, 126), 1);
+		return (write(2, ERR_INVALID_ARG, 104), 1);
 	philos = malloc(data.count * sizeof(t_philo));
 	if (!philos)
 		return (write(2, ERR_ALLOC, 25), 1);

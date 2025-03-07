@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/07 14:58:43 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/07 17:29:22 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,13 +18,15 @@
 # include <stdbool.h>
 
 # define USLEEP_INTERVAL 500
-# define MONITOR_DELAY 10
+# define MONITOR_DELAY 50 
+# define ODD_DELAY 200
+# define THINK_DELAY 50
 
 # define ERR_ARG_NB "Error: Wrong number of arguments. Usage: ./philo \
 <number_of_philosophers <time_to_die> <time_to_eat> <time_to_sleep> \
 [number_of_times_each_philosopher_must_eat]"
 # define ERR_INVALID_ARG "Error: Wrong arguments, each one should fit in an \
-unsigned int (except the last one [optional one] that need to fit in a int)\n"
+unsigned int (the last one need to be greater than 0)\n"
 # define ERR_ALLOC "Error: Allocation failed\n"
 
 # define SEM_PRINT	"/childs_print_sem"

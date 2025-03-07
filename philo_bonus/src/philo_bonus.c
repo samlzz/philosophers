@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 12:46:40 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/07 15:25:24 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/07 17:30:03 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ void	wait_childrens(pid_t *childs, size_t count)
 	i = 0;
 	while (i < count)
 		waitpid(childs[i++], NULL, 0);
+	free(childs);
 }
 
 int	main(int argc, char const *argv[])
@@ -49,7 +50,7 @@ int	main(int argc, char const *argv[])
 		return (write(2, ERR_ARG_NB, 160), 1);
 	if (init_data(&data, argc - 1, argv + 1))
 	{
-		write(2, ERR_INVALID_ARG, 126);
+		write(2, ERR_INVALID_ARG, 104);
 		return (1);
 	}
 	childs = init_childs(&data);

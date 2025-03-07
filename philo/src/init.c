@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 20:54:03 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/04 20:55:30 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/07 17:27:56 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ static int	_set_nb_field(char const *nb, int *sign_field, unsigned int *field)
 	value = ascii_to_uint(nb, &has_err);
 	if (sign_field)
 	{
-		if (value > INT_MAX)
+		if (value > INT_MAX || !value)
 			return (1);
 		*sign_field = (int)value;
 	}
