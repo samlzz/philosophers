@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/06 18:19:29 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/07 14:58:43 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ typedef struct s_philo {
 	unsigned int	id;
 	unsigned int	meals;
 	long			lst_meal_time;
-
+	struct s_data	*__dptr;
 }	t_philo;
 
 
@@ -74,5 +74,6 @@ int		children_process(unsigned int id, t_data data);
 long	date_now(void);
 void	philog(t_philo owner, t_paction state);
 int		ft_usleep(size_t milliseconds);
+bool	check_death(t_philo phi);
 
 #endif

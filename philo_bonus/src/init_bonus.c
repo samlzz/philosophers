@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 12:56:14 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/06 18:36:52 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/07 15:26:16 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,8 @@ int	open_semaphores(t_data *d_ptr)
 		sem_close(d_ptr->sem_meals_finished);
 		return (1);
 	}
+	(sem_unlink(SEM_END), sem_unlink(SEM_PRINT));
+	(sem_unlink(SEM_FORKS), sem_unlink(SEM_MEALS));
 	return (0);
 }
 
