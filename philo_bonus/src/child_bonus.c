@@ -6,23 +6,33 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 14:29:43 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/07 17:33:29 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/07 17:59:12 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_bonus.h"
 #include <pthread.h>
-#include <stdio.h>
+
+static bool	_check_death(t_philo phi)
+{
+	if (date_now() - phi.lst_meal_time >= phi.__dptr->time_to_die)
+	{
+		sem_post(phi.__dptr->sem_end);
+		philog(phi, ACT_DIE);
+		return (1);
+	}
+	return (0);
+}
 
 static bool	_eat(t_data data, t_philo *phi)
 {
 	sem_wait(data.forks);
 	philog(*phi, ACT_FORK);
-	if (check_death(*phi))
+	if (_check_death(*phi))
 		return (1);
 	sem_wait(data.forks);
 	philog(*phi, ACT_FORK);
-	if (check_death(*phi))
+	if (_check_death(*phi))
 		return (1);
 	philog(*phi, ACT_EAT);
 	ft_usleep(data.time_to_eat);
@@ -36,7 +46,7 @@ static bool	_eat(t_data data, t_philo *phi)
 
 static bool	_sleep(t_philo phi)
 {
-	if (check_death(phi))
+	if (_check_death(phi))
 		return (1);
 	philog(phi, ACT_SLEEP);	
 	ft_usleep(phi.__dptr->time_to_sleep);
@@ -45,39 +55,20 @@ static bool	_sleep(t_philo phi)
 
 static bool	_think(t_philo phi)
 {
-	if (check_death(phi))
+	if (_check_death(phi))
 		return (1);
 	philog(phi, ACT_THINK);
 	usleep(50);
 	return (0);
 }
 
-void	*meal_monitor(void *param)
-{
-	t_data	*data;
-	size_t	i;
-
-	data = (t_data *)param;
-	i = 0;
-	while (++i < data->count)
-		sem_wait(data->sem_meals_finished);
-	usleep(MONITOR_DELAY);
-	printf("All philosophers have eaten enough, ending simulation.\n");
-	sem_post(data->sem_end);
-	return (NULL);
-}
-
 int	children_process(unsigned int id, t_data data)
 {
 	t_philo		philo;
-	pthread_t	monitor;
 
 	philo = (t_philo){id, 0, data.start_time, &data};
 	if (id % 2)
 		usleep(ODD_DELAY);
-	if (data.must_eat_count != -1)
-		(pthread_create(&monitor, NULL, &meal_monitor, &data), \
-			pthread_detach(monitor));
 	while (1)
 	{
 		if (_eat(data, &philo) || _sleep(philo) || _think(philo))

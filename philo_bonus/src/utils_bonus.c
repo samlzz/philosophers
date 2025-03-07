@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:41:35 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/07 14:58:48 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/07 17:58:20 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,15 +45,4 @@ void	philog(t_philo owner, t_paction state)
 	sem_wait(owner.__dptr->sem_print);
 	printf("[%ld] %d %s\n", date_now(), owner.id, strs[state]);
 	sem_post(owner.__dptr->sem_print);
-}
-
-bool	check_death(t_philo phi)
-{
-	if (date_now() - phi.lst_meal_time >= phi.__dptr->time_to_die)
-	{
-		sem_post(phi.__dptr->sem_end);
-		philog(phi, ACT_DIE);
-		return (1);
-	}
-	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/07 17:29:22 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/07 17:59:18 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,5 @@ int		children_process(unsigned int id, t_data data);
 long	date_now(void);
 void	philog(t_philo owner, t_paction state);
 int		ft_usleep(size_t milliseconds);
-bool	check_death(t_philo phi);
 
 #endif
