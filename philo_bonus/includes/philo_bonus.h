@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/06 17:08:33 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/06 18:19:29 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,9 @@
 unsigned int (except the last one [optional one] that need to fit in a int)\n"
 # define ERR_ALLOC "Error: Allocation failed\n"
 
-# define SEM_PRINT	"/print_sem"
-# define SEM_END	"/end_sem"
+# define SEM_PRINT	"/childs_print_sem"
+# define SEM_MEALS	"/finished_meals_sem"
+# define SEM_END	"/end_simulation_sem"
 # define SEM_FORKS	"/forks_sem"
 
 typedef enum e_paction
@@ -48,22 +49,23 @@ typedef struct s_data
 	unsigned int	time_to_sleep;
 	int				must_eat_count;
 	long			start_time;
+	sem_t			*sem_print;
+	sem_t			*sem_end;
+	sem_t			*sem_meals_finished;
+	sem_t			*forks;
 }	t_data;
 
 typedef struct s_philo {
 	unsigned int	id;
 	unsigned int	meals;
 	long			lst_meal_time;
-	sem_t			*sem_print;
-	sem_t			*sem_end;
-	sem_t			*forks;
+
 }	t_philo;
 
 
 // init
 int		init_data(t_data *d_ptr, int ac, char const *av[]);
-pid_t	*init_childs(t_data data);
-int		open_semaphores(t_philo *owner, size_t count);
+pid_t	*init_childs(t_data *data);
 
 // childs
 int		children_process(unsigned int id, t_data data);
