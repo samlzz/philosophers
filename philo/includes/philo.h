@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/07 17:26:22 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/10 10:55:28 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,10 @@
 #   if !defined MUTEX_SIZE || !defined PHILO_SIZE || !defined DATA_SIZE
 #    error "The size of mutex, philo or data are unknown, please use makefile"
 #   endif
-#   if PHILO_MAX > ((STACK_SIZE - DATA_SIZE) / (PHILO_SIZE + MUTEX_SIZE))
+#   if PHILO_SIZE + MUTEX_SIZE == 0
+#    error "Invalid value for PHILO_SIZE or MUTEX_SIZE"
+#   endif
+#   if PHILO_MAX > ((STACK_SIZE - DATA_SIZE - 32768) / (PHILO_SIZE + MUTEX_SIZE))
 #    warning the PHILO_MAX provided is too large, use heap instead of stack \
 (define ALLOC_MODE to delete this warning)
 #    define ALLOC_MODE

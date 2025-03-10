@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/10 09:20:58 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/10 11:50:40 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ static void	_check_end(t_data *data)
 		i++;
 	}
 	if (have_all_eat)
-		(printf("[%ld] All philosophers have eaten enough, end of simulation.\
-			\n", date_now()), set_sim_end(data, true));
+		(printf("%ld All philosophers have eaten enough, end of simulation.\
+			\n", data->start_time - date_now()), set_sim_end(data, true));
 }
 
 void	*monitoring(void *param)
