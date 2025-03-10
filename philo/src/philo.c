@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/10 18:55:48 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/10 19:47:24 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static void	*meal_monitor(void *param)
 		ft_usleep(MONITOR_DELAY);
 	}
 	if (!killed)
-		printf("[%ld] All philosophers have eaten enough.\n", \
+		printf("%ld All philosophers have eaten enough.\n", \
 			date_now() - data->start_time);
 	return (NULL);
 }
@@ -65,6 +65,7 @@ int	main(int argc, char const *argv[])
 	t_philo		philos[PHILO_MAX];
 	t_mutex		forks[PHILO_MAX];
 	pthread_t	monitor;
+	size_t		i;
 
 	if (argc < 5 || argc > 6)
 		return (write(2, ERR_ARG_NB, 160), 1);
@@ -73,8 +74,9 @@ int	main(int argc, char const *argv[])
 	init_philo_and_forks(&data, philos, forks);
 	pthread_create(&monitor, NULL, &meal_monitor, &data);
 	pthread_detach(monitor);
-	while (data.count)
-		pthread_join(data.philos[--data.count].thread, NULL);
+	i = 0;
+	while (i < data.count)
+		pthread_join(data.philos[i++].thread, NULL);
 	_destroy_data(&data, false);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:41:35 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/10 18:09:46 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/10 19:53:55 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,8 @@ void	philog(t_philo phi, t_paction state)
 	strs[ACT_THINK] = "is thinking";
 	strs[ACT_DIE] = "died";
 	pthread_mutex_lock(&phi.data->print_mutex);
-	printf("%ld %d %s\n", date_now() - phi.data->start_time, phi.id, strs[state]);
+	printf("%ld %d %s\n", date_now() - phi.data->start_time, \
+		phi.id, strs[state]);
 	pthread_mutex_unlock(&phi.data->print_mutex);
 }
 
@@ -62,7 +63,7 @@ void	set_shared(t_shared	*__ptr, t_shared_ope ope, int32_t value)
 int32_t	get_shared(t_shared from)
 {
 	int32_t	val;
-	
+
 	pthread_mutex_lock(&from.mtx);
 	val = from.__val;
 	pthread_mutex_unlock(&from.mtx);

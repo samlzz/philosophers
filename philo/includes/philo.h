@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/10 19:03:31 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/10 19:55:51 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,8 @@
 #   if PHILO_SIZE + MUTEX_SIZE == 0
 #    error "Invalid value for PHILO_SIZE or MUTEX_SIZE"
 #   endif
-#   if PHILO_MAX > ((STACK_SIZE - DATA_SIZE - 32768) / (PHILO_SIZE + MUTEX_SIZE))
+#   if PHILO_MAX > ((STACK_SIZE - DATA_SIZE - 32768) / \
+(PHILO_SIZE + MUTEX_SIZE))
 #    warning the PHILO_MAX provided is too large, use heap instead of stack \
 (define ALLOC_MODE to delete this warning)
 #    define ALLOC_MODE
@@ -64,15 +65,15 @@ typedef struct s_philo
 {
 	int32_t			id;
 	int32_t			meals_eaten;
-	uint64_t			last_meal_time;
-	uint64_t			next_meal_time;
+	uint64_t		last_meal_time;
+	uint64_t		next_meal_time;
 	pthread_t		thread;
 	t_mutex			*left_fork;
 	t_mutex			*right_fork;
 	struct s_data	*data;
 }	t_philo;
 
-typedef enum {
+typedef enum e_shared_ope{
 	SH_SET,
 	SH_INCREMENT,
 	SH_DECREMENT
@@ -91,7 +92,7 @@ typedef struct s_data
 	uint32_t	time_to_eat;
 	uint32_t	time_to_sleep;
 	int32_t		must_eat_count;
-	uint64_t		start_time;
+	uint64_t	start_time;
 	t_shared	sim_state;
 	t_shared	sated;
 	t_mutex		print_mutex;
@@ -100,11 +101,12 @@ typedef struct s_data
 }	t_data;
 
 // init
-void	init_philo_and_forks(t_data *d_ptr, t_philo *philos, t_mutex *forks);
+void		init_philo_and_forks(t_data *d_ptr, t_philo *philos, \
+		t_mutex *forks);
 int32_t		init_data(t_data *d_ptr, int ac, char const *av[]);
 
 // routine
-void	*philo_life(void *param);
+void		*philo_life(void *param);
 
 // utils
 uint64_t	date_now(void);

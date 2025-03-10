@@ -6,15 +6,14 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/28 15:32:18 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/10 19:00:19 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/10 19:57:08 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 #include <unistd.h>
-#include <stdio.h>
 
-static inline bool _take_forks(t_philo *phi)
+static inline bool	_take_forks(t_philo *phi)
 {
 	pthread_mutex_lock(phi->left_fork);
 	philog(*phi, ACT_FORK);
@@ -45,7 +44,9 @@ static bool	_eat(t_philo *phi)
 	phi->meals_eaten++;
 	if (phi->data->must_eat_count != -1 && \
 		phi->meals_eaten == phi->data->must_eat_count)
+	{
 		set_shared(&phi->data->sated, SH_INCREMENT, 1);
+	}
 	philog(*phi, ACT_EAT);
 	if (phi->last_meal_time + phi->data->time_to_eat >= phi->next_meal_time)
 		ft_usleep(phi->next_meal_time - phi->last_meal_time);
@@ -63,6 +64,8 @@ static bool	_sleep(t_philo *phi)
 	uint64_t	curr_time;
 
 	curr_time = date_now();
+	if (!get_shared(phi->data->sim_state))
+		return (0);
 	philog(*phi, ACT_SLEEP);
 	if (curr_time + phi->data->time_to_sleep >= phi->next_meal_time)
 	{
