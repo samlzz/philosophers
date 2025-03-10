@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/10 11:50:40 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/10 18:55:48 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,59 +15,41 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static void	_check_end(t_data *data)
-{
-	size_t	i;
-	bool	have_all_eat;
-	long	lst_meal;
-
-	i = 0;
-	have_all_eat = data->must_eat_count != -1;
-	while (i < data->count)
-	{
-		pthread_mutex_lock(&data->philos[i].meal_mutex);
-		if (data->philos[i].meals_eaten < data->must_eat_count)
-			have_all_eat = false;
-		lst_meal = data->philos[i].last_meal_time;
-		pthread_mutex_unlock(&data->philos[i].meal_mutex);
-		if (date_now() - lst_meal >= data->time_to_die)
-		{
-			set_sim_end(data, true);
-			philog(data->philos[i], ACT_DIE);
-			return ;
-		}
-		i++;
-	}
-	if (have_all_eat)
-		(printf("%ld All philosophers have eaten enough, end of simulation.\
-			\n", data->start_time - date_now()), set_sim_end(data, true));
-}
-
-void	*monitoring(void *param)
+static void	*meal_monitor(void *param)
 {
 	t_data	*data;
+	bool	killed;
 
+	killed = true;
 	data = (t_data *)param;
-	while (!get_sim_end(data))
+	while (get_shared(data->sim_state))
 	{
-		_check_end(data);
+		if ((uint32_t)get_shared(data->sated) == data->count)
+		{
+			set_shared(&data->sim_state, SH_SET, false);
+			killed = false;
+			break ;
+		}
 		ft_usleep(MONITOR_DELAY);
 	}
+	if (!killed)
+		printf("[%ld] All philosophers have eaten enough.\n", \
+			date_now() - data->start_time);
 	return (NULL);
 }
 
-static void	_destroy_data(t_data *d_ptr, bool alloc_mode)
+static inline void	_destroy_data(t_data *d_ptr, bool alloc_mode)
 {
 	size_t	i;
 
 	i = 0;
 	while (i < d_ptr->count)
 	{
-		pthread_mutex_destroy(&d_ptr->philos[i].meal_mutex);
 		pthread_mutex_destroy(d_ptr->forks + i++);
 	}
 	pthread_mutex_destroy(&d_ptr->print_mutex);
-	pthread_mutex_destroy(&d_ptr->end_mutex);
+	pthread_mutex_destroy(&d_ptr->sim_state.mtx);
+	pthread_mutex_destroy(&d_ptr->sated.mtx);
 	if (alloc_mode)
 	{
 		free(d_ptr->philos);
@@ -89,8 +71,8 @@ int	main(int argc, char const *argv[])
 	if (init_data(&data, argc - 1, argv + 1))
 		return (write(2, ERR_INVALID_ARG, 104), 1);
 	init_philo_and_forks(&data, philos, forks);
-	pthread_create(&monitor, NULL, &monitoring, (void *)&data);
-	pthread_join(monitor, NULL);
+	pthread_create(&monitor, NULL, &meal_monitor, &data);
+	pthread_detach(monitor);
 	while (data.count)
 		pthread_join(data.philos[--data.count].thread, NULL);
 	_destroy_data(&data, false);

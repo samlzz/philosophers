@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:41:35 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/10 11:24:30 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/10 18:09:46 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-long	date_now(void)
+uint64_t	date_now(void)
 {
 	struct timeval	tv;
 
@@ -24,19 +24,17 @@ long	date_now(void)
 	return (tv.tv_sec * 1000L + tv.tv_usec / 1000);
 }
 
-int	ft_usleep(size_t milliseconds)
+void	ft_usleep(size_t milliseconds)
 {
 	size_t	start;
 
 	start = date_now();
 	while ((date_now() - start) < milliseconds)
 		usleep(USLEEP_INTERVAL);
-	return (0);
 }
 
-bool	philog(t_philo phi, t_paction state)
+void	philog(t_philo phi, t_paction state)
 {
-	long	timestamp;
 	char	*strs[ACT_DIE + 1];
 
 	strs[ACT_FORK] = "has taken a fork";
@@ -44,29 +42,29 @@ bool	philog(t_philo phi, t_paction state)
 	strs[ACT_SLEEP] = "is sleeping";
 	strs[ACT_THINK] = "is thinking";
 	strs[ACT_DIE] = "died";
-	timestamp = date_now();
-	if (state != ACT_DIE && \
-		timestamp - phi.last_meal_time >= phi.data->time_to_die)
-		return (1);
 	pthread_mutex_lock(&phi.data->print_mutex);
-	printf("%ld %d %s\n", timestamp - phi.data->start_time, phi.id, strs[state]);
+	printf("%ld %d %s\n", date_now() - phi.data->start_time, phi.id, strs[state]);
 	pthread_mutex_unlock(&phi.data->print_mutex);
-	return (0);
 }
 
-void	set_sim_end(t_data *d_ptr, bool value)
+void	set_shared(t_shared	*__ptr, t_shared_ope ope, int32_t value)
 {
-	pthread_mutex_lock(&d_ptr->end_mutex);
-	d_ptr->__sim_end = value;
-	pthread_mutex_unlock(&d_ptr->end_mutex);
+	pthread_mutex_lock(&__ptr->mtx);
+	if (ope == SH_SET)
+		__ptr->__val = value;
+	else if (ope == SH_INCREMENT)
+		__ptr->__val += value;
+	else if (ope == SH_DECREMENT)
+		__ptr->__val -= value;
+	pthread_mutex_unlock(&__ptr->mtx);
 }
 
-bool	get_sim_end(t_data *d_ptr)
+int32_t	get_shared(t_shared from)
 {
-	bool	end;
-
-	pthread_mutex_lock(&d_ptr->end_mutex);
-	end = d_ptr->__sim_end;
-	pthread_mutex_unlock(&d_ptr->end_mutex);
-	return (end);
+	int32_t	val;
+	
+	pthread_mutex_lock(&from.mtx);
+	val = from.__val;
+	pthread_mutex_unlock(&from.mtx);
+	return (val);
 }

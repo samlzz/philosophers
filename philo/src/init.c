@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 20:54:03 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/10 09:27:01 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/10 19:02:35 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include <string.h>
 #include <limits.h>
 
-unsigned int	ascii_to_uint(const char *nptr, int *error)
+static inline uint32_t	ascii_to_uint(const char *nptr, int *error)
 {
 	unsigned long	r;
 
@@ -40,10 +40,11 @@ unsigned int	ascii_to_uint(const char *nptr, int *error)
 	return ((unsigned int)r);
 }
 
-static int	_set_nb_field(char const *nb, int *sign_field, unsigned int *field)
+static inline int	_set_nb_field(char const *nb, int32_t *sign_field, \
+	uint32_t *field)
 {
-	int				has_err;
-	unsigned int	value;
+	int32_t		has_err;
+	uint32_t	value;
 
 	has_err = 0;
 	value = ascii_to_uint(nb, &has_err);
@@ -61,7 +62,6 @@ static int	_set_nb_field(char const *nb, int *sign_field, unsigned int *field)
 int	init_data(t_data *d_ptr, int ac, char const *av[])
 {
 	memset(d_ptr, 0, sizeof(t_data));
-	d_ptr->start_time = date_now();
 	if (_set_nb_field(av[0], NULL, &d_ptr->count))
 		return (1);
 	if (_set_nb_field(av[1], NULL, &d_ptr->time_to_die))
@@ -74,12 +74,20 @@ int	init_data(t_data *d_ptr, int ac, char const *av[])
 		return (1);
 	if (ac == 4)
 		d_ptr->must_eat_count = -1;
-	pthread_mutex_init(&d_ptr->print_mutex, NULL);
-	pthread_mutex_init(&d_ptr->end_mutex, NULL);
+	if (pthread_mutex_init(&d_ptr->print_mutex, NULL))
+		return (1);
+	if (pthread_mutex_init(&d_ptr->sim_state.mtx, NULL))
+		return (pthread_mutex_destroy(&d_ptr->print_mutex), 1);
+	if (pthread_mutex_init(&d_ptr->sated.mtx, NULL))
+	{
+		pthread_mutex_destroy(&d_ptr->print_mutex);
+		pthread_mutex_destroy(&d_ptr->sim_state.mtx);
+		return (1);
+	}
 	return (0);
 }
 
-static void	_init_philos(t_data *d_ptr, t_philo *philos)
+static inline void	_init_philos(t_data *d_ptr, t_philo *philos)
 {
 	size_t	i;
 
@@ -87,11 +95,9 @@ static void	_init_philos(t_data *d_ptr, t_philo *philos)
 	while (i < d_ptr->count)
 	{
 		philos[i].id = i + 1;
-		philos[i].last_meal_time = d_ptr->start_time;
 		philos[i].left_fork = d_ptr->forks + i;
 		philos[i].right_fork = d_ptr->forks + ((i + 1) % d_ptr->count);
 		philos[i].data = d_ptr;
-		pthread_mutex_init(&philos[i].meal_mutex, NULL);
 		pthread_create(&philos[i].thread, NULL, &philo_life, philos + i);
 		i++;
 	}
@@ -104,8 +110,10 @@ void	init_philo_and_forks(t_data *d_ptr, t_philo *philos, t_mutex *forks)
 	i = 0;
 	while (i < d_ptr->count)
 		pthread_mutex_init(forks + i++, NULL);
-	d_ptr->forks = forks;
 	memset(philos, 0, sizeof(t_philo) * d_ptr->count);
+	d_ptr->forks = forks;
 	_init_philos(d_ptr, philos);
+	set_shared(&d_ptr->sim_state, SH_SET, true);
+	d_ptr->start_time = date_now();
 	d_ptr->philos = philos;
 }

@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/10 10:55:28 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/10 19:03:31 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <pthread.h>
 # include <stdbool.h>
+# include <stdint.h>
 
 # ifndef STACK_SIZE
 #  define STACK_SIZE 8388608
@@ -61,44 +62,55 @@ typedef pthread_mutex_t	t_mutex;
 
 typedef struct s_philo
 {
-	int				id;
-	int				meals_eaten;
-	long			last_meal_time;
-	t_mutex			meal_mutex;
+	int32_t			id;
+	int32_t			meals_eaten;
+	uint64_t			last_meal_time;
+	uint64_t			next_meal_time;
 	pthread_t		thread;
 	t_mutex			*left_fork;
 	t_mutex			*right_fork;
 	struct s_data	*data;
 }	t_philo;
 
+typedef enum {
+	SH_SET,
+	SH_INCREMENT,
+	SH_DECREMENT
+}	t_shared_ope;
+
+typedef struct s_shared
+{
+	int32_t	__val;
+	t_mutex	mtx;
+}	t_shared;
+
 typedef struct s_data
 {
-	unsigned int	count;
-	unsigned int	time_to_die;
-	unsigned int	time_to_eat;
-	unsigned int	time_to_sleep;
-	int				must_eat_count;
-	long			start_time;
-	int				__sim_end : 1;
-	t_mutex			end_mutex;
-	t_mutex			print_mutex;
-	t_mutex			*forks;
-	t_philo			*philos;
+	uint32_t	count;
+	uint32_t	time_to_die;
+	uint32_t	time_to_eat;
+	uint32_t	time_to_sleep;
+	int32_t		must_eat_count;
+	uint64_t		start_time;
+	t_shared	sim_state;
+	t_shared	sated;
+	t_mutex		print_mutex;
+	t_mutex		*forks;
+	t_philo		*philos;
 }	t_data;
 
 // init
-void			init_philo_and_forks(t_data *d_ptr, t_philo *philos, \
-	t_mutex *forks);
-int				init_data(t_data *d_ptr, int ac, char const *av[]);
+void	init_philo_and_forks(t_data *d_ptr, t_philo *philos, t_mutex *forks);
+int32_t		init_data(t_data *d_ptr, int ac, char const *av[]);
 
 // routine
-void			*philo_life(void *param);
+void	*philo_life(void *param);
 
 // utils
-long			date_now(void);
-bool			philog(t_philo phi, t_paction state);
-int				ft_usleep(size_t milliseconds);
-void			set_sim_end(t_data *d_ptr, bool value);
-bool			get_sim_end(t_data *d_ptr);
+uint64_t	date_now(void);
+void		philog(t_philo phi, t_paction state);
+void		ft_usleep(size_t milliseconds);
+void		set_shared(t_shared	*__ptr, t_shared_ope ope, int32_t value);
+int32_t		get_shared(t_shared from);
 
 #endif
