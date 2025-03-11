@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:41:35 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/10 19:53:55 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/11 15:46:35 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,16 +35,17 @@ void	ft_usleep(size_t milliseconds)
 
 void	philog(t_philo phi, t_paction state)
 {
+	long	time;
 	char	*strs[ACT_DIE + 1];
 
+	time = date_now();
 	strs[ACT_FORK] = "has taken a fork";
 	strs[ACT_EAT] = "is eating";
 	strs[ACT_SLEEP] = "is sleeping";
 	strs[ACT_THINK] = "is thinking";
 	strs[ACT_DIE] = "died";
 	pthread_mutex_lock(&phi.data->print_mutex);
-	printf("%ld %d %s\n", date_now() - phi.data->start_time, \
-		phi.id, strs[state]);
+	printf("%ld %d %s\n", time - phi.data->start_time, phi.id, strs[state]);
 	pthread_mutex_unlock(&phi.data->print_mutex);
 }
 
