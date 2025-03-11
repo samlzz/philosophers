@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/10 19:47:24 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/11 16:33:19 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,18 +62,24 @@ static inline void	_destroy_data(t_data *d_ptr, bool alloc_mode)
 int	main(int argc, char const *argv[])
 {
 	t_data		data;
-	t_philo		philos[PHILO_MAX];
-	t_mutex		forks[PHILO_MAX];
+	t_philo		philos[PHI_MAX + 1];
+	t_mutex		forks[PHI_MAX + 1];
 	pthread_t	monitor;
 	size_t		i;
 
 	if (argc < 5 || argc > 6)
 		return (write(2, ERR_ARG_NB, 160), 1);
-	if (init_data(&data, argc - 1, argv + 1))
+	i = init_data(&data, argc - 1, argv + 1);
+	if (i == 2)
+		return (write(2, ERR_PHI_MAX_TOHIGH, 66), 1);
+	else if (i == 1)
 		return (write(2, ERR_INVALID_ARG, 104), 1);
 	init_philo_and_forks(&data, philos, forks);
-	pthread_create(&monitor, NULL, &meal_monitor, &data);
-	pthread_detach(monitor);
+	if (data.must_eat_count != -1)
+	{
+		pthread_create(&monitor, NULL, &meal_monitor, &data);
+		pthread_detach(monitor);
+	}
 	i = 0;
 	while (i < data.count)
 		pthread_join(data.philos[i++].thread, NULL);

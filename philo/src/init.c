@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 20:54:03 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/10 19:02:35 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/11 16:34:06 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,8 @@ static inline int	_set_nb_field(char const *nb, int32_t *sign_field, \
 int	init_data(t_data *d_ptr, int ac, char const *av[])
 {
 	memset(d_ptr, 0, sizeof(t_data));
-	if (_set_nb_field(av[0], NULL, &d_ptr->count))
-		return (1);
+	if (_set_nb_field(av[0], NULL, &d_ptr->count) || d_ptr->count > PHI_MAX)
+		return ((d_ptr->count > PHI_MAX) * 2 + !(d_ptr->count > PHI_MAX) * 1);
 	if (_set_nb_field(av[1], NULL, &d_ptr->time_to_die))
 		return (1);
 	if (_set_nb_field(av[2], NULL, &d_ptr->time_to_eat))
@@ -113,7 +113,7 @@ void	init_philo_and_forks(t_data *d_ptr, t_philo *philos, t_mutex *forks)
 	memset(philos, 0, sizeof(t_philo) * d_ptr->count);
 	d_ptr->forks = forks;
 	_init_philos(d_ptr, philos);
+	d_ptr->philos = philos;
 	set_shared(&d_ptr->sim_state, SH_SET, true);
 	d_ptr->start_time = date_now();
-	d_ptr->philos = philos;
 }

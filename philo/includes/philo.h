@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/10 19:55:51 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/11 16:32:03 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@
 # endif
 
 # ifndef ALLOC_MODE
-#  ifndef PHILO_MAX
-#   define PHILO_MAX 200
+#  ifndef PHI_MAX
+#   define PHI_MAX 200
 #  else
 #   if !defined MUTEX_SIZE || !defined PHILO_SIZE || !defined DATA_SIZE
 #    error "The size of mutex, philo or data are unknown, please use makefile"
@@ -31,9 +31,9 @@
 #   if PHILO_SIZE + MUTEX_SIZE == 0
 #    error "Invalid value for PHILO_SIZE or MUTEX_SIZE"
 #   endif
-#   if PHILO_MAX > ((STACK_SIZE - DATA_SIZE - 32768) / \
+#   if PHI_MAX > ((STACK_SIZE - DATA_SIZE - 32768) / \
 (PHILO_SIZE + MUTEX_SIZE))
-#    warning the PHILO_MAX provided is too large, use heap instead of stack \
+#    warning the PHI_MAX provided is too large, use heap instead of stack \
 (define ALLOC_MODE to delete this warning)
 #    define ALLOC_MODE
 #   endif
@@ -48,6 +48,8 @@
 [number_of_times_each_philosopher_must_eat]"
 # define ERR_INVALID_ARG "Error: Wrong arguments, each one should fit in an \
 unsigned int (the last one need to be greater than 0)\n"
+# define ERR_PHI_MAX_TOHIGH "Error: 'PHI_MAX' is lower than number of \
+philosophers you provide\n"
 # define ERR_ALLOC "Error: Allocation failed\n"
 
 typedef enum e_paction
