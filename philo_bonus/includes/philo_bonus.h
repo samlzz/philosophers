@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/07 17:59:18 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/11 17:20:05 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ unsigned int (the last one need to be greater than 0)\n"
 
 # define SEM_PRINT	"/childs_print_sem"
 # define SEM_MEALS	"/finished_meals_sem"
+# define SEM_START	"/start_simulation_sem"
 # define SEM_END	"/end_simulation_sem"
 # define SEM_FORKS	"/forks_sem"
 
@@ -52,6 +53,7 @@ typedef struct s_data
 	int				must_eat_count;
 	long			start_time;
 	sem_t			*sem_print;
+	sem_t			*sem_start;
 	sem_t			*sem_end;
 	sem_t			*sem_meals_finished;
 	sem_t			*forks;
@@ -61,6 +63,7 @@ typedef struct s_philo {
 	unsigned int	id;
 	unsigned int	meals;
 	long			lst_meal_time;
+	long			next_meal_time;
 	struct s_data	*__dptr;
 }	t_philo;
 
@@ -76,5 +79,6 @@ int		children_process(unsigned int id, t_data data);
 long	date_now(void);
 void	philog(t_philo owner, t_paction state);
 int		ft_usleep(size_t milliseconds);
+void	close_sems(t_data *d_ptr);
 
 #endif

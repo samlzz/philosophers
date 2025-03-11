@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 12:46:40 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/07 17:55:36 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/11 17:39:41 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,18 +18,7 @@
 #include <pthread.h>	
 #include <stdio.h>
 
-void	destroy_data(t_data *d_ptr)
-{
-	if (d_ptr)
-	{
-		sem_close(d_ptr->sem_end);
-		sem_close(d_ptr->sem_print);
-		sem_close(d_ptr->sem_meals_finished);
-		sem_close(d_ptr->forks);
-	}
-}
-
-void	wait_childrens(pid_t *childs, size_t count)
+static void	_wait_childrens(pid_t *childs, size_t count)
 {
 	size_t	i;
 
@@ -51,12 +40,19 @@ void	*meal_monitor(void *param)
 	i = 0;
 	while (i < data->count)
 	{
+		sem_post(data->sem_start);
+		i++;
+	}
+	data->start_time = date_now();
+	i = 0;
+	while (i < data->count)
+	{
 		sem_wait(data->sem_meals_finished);
 		i++;
 	}
 	usleep(MONITOR_DELAY);
-	printf("[%ld] All philosophers have eaten enough, end of simulation.\n", \
-		date_now());
+	printf("%ld All philosophers have eaten enough.\n", \
+		date_now() - data->start_time);
 	sem_post(data->sem_end);
 	return (NULL);
 }
@@ -81,7 +77,7 @@ int	main(int argc, char const *argv[])
 		(pthread_create(&monitor, NULL, &meal_monitor, &data), \
 			pthread_detach(monitor));
 	sem_wait(data.sem_end);
-	wait_childrens(childs, data.count);
-	destroy_data(&data);
+	_wait_childrens(childs, data.count);
+	close_sems(&data);
 	return (0);	
 }

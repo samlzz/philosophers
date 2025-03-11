@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:41:35 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/07 17:58:20 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/11 17:22:12 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,15 +34,31 @@ int	ft_usleep(size_t milliseconds)
 }
 
 void	philog(t_philo owner, t_paction state)
-{	
+{
+	long	time;
 	char	*strs[ACT_DIE + 1];
 
+	time = date_now() - owner.__dptr->start_time;
 	strs[ACT_FORK] = "has taken a fork";
 	strs[ACT_EAT] = "is eating";
 	strs[ACT_SLEEP] = "is sleeping";
 	strs[ACT_THINK] = "is thinking";
 	strs[ACT_DIE] = "is died";
 	sem_wait(owner.__dptr->sem_print);
-	printf("[%ld] %d %s\n", date_now(), owner.id, strs[state]);
+	printf("%ld %d %s\n", time, owner.id, strs[state]);
 	sem_post(owner.__dptr->sem_print);
+}
+
+void	close_sems(t_data *d_ptr)
+{
+	if (d_ptr->sem_end)
+		sem_close(d_ptr->sem_end);
+	if (d_ptr->sem_start)
+		sem_close(d_ptr->sem_start);
+	if (d_ptr->sem_print)
+		sem_close(d_ptr->sem_print);
+	if (d_ptr->sem_meals_finished)
+		sem_close(d_ptr->sem_meals_finished);
+	if (d_ptr->forks)
+		sem_close(d_ptr->forks);
 }

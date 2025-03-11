@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 12:56:14 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/07 17:27:44 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/11 17:34:34 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <signal.h>
 #include <fcntl.h>
 
-unsigned int	ascii_to_uint(const char *nptr, int *error)
+static inline unsigned int	_ascii_to_uint(const char *nptr, int *error)
 {
 	unsigned long	r;
 
@@ -64,7 +64,6 @@ static int	_set_nb_field(char const *nb, int *sign_field, unsigned int *field)
 int	init_data(t_data *d_ptr, int ac, char const *av[])
 {
 	memset(d_ptr, 0, sizeof(t_data));
-	d_ptr->start_time = date_now();
 	if (_set_nb_field(av[0], NULL, &d_ptr->count))
 		return (1);
 	if (_set_nb_field(av[1], NULL, &d_ptr->time_to_die))
@@ -80,31 +79,28 @@ int	init_data(t_data *d_ptr, int ac, char const *av[])
 	return (0);
 }
 
-int	open_semaphores(t_data *d_ptr)
+static inline int	open_semaphores(t_data *d_ptr)
 {
 	d_ptr->sem_end = sem_open(SEM_END, O_CREAT, 0644, 0);
 	if (d_ptr->sem_end == SEM_FAILED)
 		return (1);
+	d_ptr->sem_start = sem_open(SEM_START, O_CREAT, 0644, 0);
+	if (d_ptr->sem_start == SEM_FAILED)
+		return (sem_close(d_ptr->sem_end), 1);
 	d_ptr->sem_print = sem_open(SEM_PRINT, O_CREAT, 0644, 1);
 	if (d_ptr->sem_print == SEM_FAILED)
-		return (sem_close(d_ptr->sem_end), 1);
+		return (close_sems(d_ptr), 1);
 	d_ptr->sem_meals_finished = sem_open(SEM_MEALS, O_CREAT, 0644, 0);
 	if (d_ptr->sem_meals_finished == SEM_FAILED)
-	{
-		sem_close(d_ptr->sem_end);
-		sem_close(d_ptr->sem_print);
-		return (1);
-	}
+		return(close_sems(d_ptr), 1);
 	d_ptr->forks = sem_open(SEM_FORKS, O_CREAT, 0644, d_ptr->count);
 	if (d_ptr->forks == SEM_FAILED)
-	{
-		sem_close(d_ptr->sem_end);
-		sem_close(d_ptr->sem_print);
-		sem_close(d_ptr->sem_meals_finished);
-		return (1);
-	}
-	(sem_unlink(SEM_END), sem_unlink(SEM_PRINT));
-	(sem_unlink(SEM_FORKS), sem_unlink(SEM_MEALS));
+		return(close_sems(d_ptr), 1);
+	(sem_unlink(SEM_END), \
+	sem_unlink(SEM_START), \
+	sem_unlink(SEM_PRINT), \
+	sem_unlink(SEM_FORKS), \
+	sem_unlink(SEM_MEALS));
 	return (0);
 }
 
@@ -128,8 +124,7 @@ pid_t	*init_childs(t_data *data)
 		{
 			while (i > 0)
 				kill(childs[--i], SIGKILL);
-			(sem_close(data->sem_end), sem_close(data->sem_print));
-			(sem_close(data->forks), sem_close(data->sem_meals_finished));
+			close_sems(data);
 			return (free(childs), NULL);
 		}
 		i++;
