@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/28 15:32:18 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/11 15:54:55 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/14 14:10:45 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ static bool	_sleep(t_philo *phi)
 	uint64_t	curr_time;
 
 	curr_time = date_now();
-	if (!get_shared(phi->data->sim_state))
+	if (!get_shared(&phi->data->sim_state))
 		return (0);
 	philog(*phi, ACT_SLEEP);
 	if (curr_time + phi->data->time_to_sleep >= phi->next_meal_time)
@@ -86,7 +86,7 @@ static bool	_sleep(t_philo *phi)
 
 static bool	_think(t_philo *phi)
 {
-	if (get_shared(phi->data->sim_state))
+	if (get_shared(&phi->data->sim_state))
 		philog(*phi, ACT_THINK);
 	if (phi->data->count % 2)
 		ft_usleep((phi->next_meal_time - date_now()) / 3);
@@ -98,7 +98,7 @@ void	*philo_life(void *param)
 	t_philo	*phi;
 
 	phi = (t_philo *)param;
-	while (!get_shared(phi->data->sim_state))
+	while (!get_shared(&phi->data->sim_state))
 		ft_usleep(1);
 	if (phi->id % 2 == 0)
 		ft_usleep(3);
@@ -106,7 +106,7 @@ void	*philo_life(void *param)
 		ft_usleep(1);
 	phi->last_meal_time = phi->data->start_time;
 	phi->next_meal_time = phi->last_meal_time + phi->data->time_to_die;
-	while (get_shared(phi->data->sim_state))
+	while (get_shared(&phi->data->sim_state))
 	{
 		if (_eat(phi) || _sleep(phi) || _think(phi))
 		{

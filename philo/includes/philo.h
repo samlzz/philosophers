@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/11 16:32:03 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/14 14:23:24 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,10 @@
 unsigned int (the last one need to be greater than 0)\n"
 # define ERR_PHI_MAX_TOHIGH "Error: 'PHI_MAX' is lower than number of \
 philosophers you provide\n"
-# define ERR_ALLOC "Error: Allocation failed\n"
+
+# ifdef ALLOC_MODE
+#  define ERR_ALLOC "Error: Allocation failed\n"
+# endif
 
 typedef enum e_paction
 {
@@ -115,6 +118,6 @@ uint64_t	date_now(void);
 void		philog(t_philo phi, t_paction state);
 void		ft_usleep(size_t milliseconds);
 void		set_shared(t_shared	*__ptr, t_shared_ope ope, int32_t value);
-int32_t		get_shared(t_shared from);
+int32_t		get_shared(t_shared *from);
 
 #endif

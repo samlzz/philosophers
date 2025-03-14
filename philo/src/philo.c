@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/11 16:33:19 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/14 14:30:32 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,9 @@ static void	*meal_monitor(void *param)
 
 	killed = true;
 	data = (t_data *)param;
-	while (get_shared(data->sim_state))
+	while (get_shared(&data->sim_state))
 	{
-		if ((uint32_t)get_shared(data->sated) == data->count)
+		if ((uint32_t)get_shared(&data->sated) == data->count)
 		{
 			set_shared(&data->sim_state, SH_SET, false);
 			killed = false;
@@ -42,10 +42,11 @@ static inline void	_destroy_data(t_data *d_ptr, bool alloc_mode)
 {
 	size_t	i;
 
-	i = 0;
-	while (i < d_ptr->count)
+	if (d_ptr->forks)
 	{
-		pthread_mutex_destroy(d_ptr->forks + i++);
+		i = 0;
+		while (i < d_ptr->count)
+			pthread_mutex_destroy(d_ptr->forks + i++);
 	}
 	pthread_mutex_destroy(&d_ptr->print_mutex);
 	pthread_mutex_destroy(&d_ptr->sim_state.mtx);
@@ -72,7 +73,7 @@ int	main(int argc, char const *argv[])
 	i = init_data(&data, argc - 1, argv + 1);
 	if (i == 2)
 		return (write(2, ERR_PHI_MAX_TOHIGH, 66), 1);
-	else if (i == 1)
+	else if (i)
 		return (write(2, ERR_INVALID_ARG, 104), 1);
 	init_philo_and_forks(&data, philos, forks);
 	if (data.must_eat_count != -1)
@@ -95,26 +96,26 @@ int	main(int argc, char const *argv[])
 	t_philo		*philos;
 	t_mutex		*forks;
 	pthread_t	monitor;
+	size_t		i;
 
 	if (argc < 5 || argc > 6)
 		return (write(2, ERR_ARG_NB, 160), 1);
-	if (init_data(&data, argc - 1, argv + 1))
+	i = init_data(&data, argc - 1, argv + 1);
+	if (i == 2)
+		return (write(2, ERR_PHI_MAX_TOHIGH, 66), 1);
+	else if (i)
 		return (write(2, ERR_INVALID_ARG, 104), 1);
-	philos = malloc(data.count * sizeof(t_philo));
-	if (!philos)
-		return (write(2, ERR_ALLOC, 25), 1);
+	(data.philos = (philos = malloc(data.count * sizeof(t_philo))));
 	forks = malloc(data.count * sizeof(t_mutex));
-	if (!forks)
-	{
-		free(philos);
-		write(2, ERR_ALLOC, 25);
-		return (1);
-	}
+	if (!philos || !forks)
+		return (_destroy_data(&data, true) 1);
 	init_philo_and_forks(&data, philos, forks);
-	pthread_create(&monitor, NULL, &monitoring, (void *)&data);
-	pthread_join(monitor, NULL);
-	while (data.count)
-		pthread_join(data.philos[--data.count].thread, NULL);
+	if (data.must_eat_count != -1)
+		(pthread_create(&monitor, NULL, &monitoring, (void *)&data), \
+			pthread_join(monitor, NULL));
+	i = 0;
+	while (i < data.count)
+		pthread_join(data.philos[i++].thread, NULL);
 	return (_destroy_data(&data, true), 0);
 }
 

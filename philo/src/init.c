@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 20:54:03 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/11 16:34:06 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/14 14:30:54 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,6 @@ void	init_philo_and_forks(t_data *d_ptr, t_philo *philos, t_mutex *forks)
 	d_ptr->forks = forks;
 	_init_philos(d_ptr, philos);
 	d_ptr->philos = philos;
-	set_shared(&d_ptr->sim_state, SH_SET, true);
 	d_ptr->start_time = date_now();
+	set_shared(&d_ptr->sim_state, SH_SET, true);
 }

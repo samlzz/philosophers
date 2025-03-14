@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:41:35 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/11 15:46:35 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/14 14:09:42 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,12 +61,12 @@ void	set_shared(t_shared	*__ptr, t_shared_ope ope, int32_t value)
 	pthread_mutex_unlock(&__ptr->mtx);
 }
 
-int32_t	get_shared(t_shared from)
+int32_t	get_shared(t_shared *from)
 {
 	int32_t	val;
 
-	pthread_mutex_lock(&from.mtx);
-	val = from.__val;
-	pthread_mutex_unlock(&from.mtx);
+	pthread_mutex_lock(&from->mtx);
+	val = from->__val;
+	pthread_mutex_unlock(&from->mtx);
 	return (val);
 }
