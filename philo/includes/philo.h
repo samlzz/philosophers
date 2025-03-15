@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/14 14:23:24 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/15 13:17:31 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,11 +48,16 @@
 [number_of_times_each_philosopher_must_eat]"
 # define ERR_INVALID_ARG "Error: Wrong arguments, each one should fit in an \
 unsigned int (the last one need to be greater than 0)\n"
-# define ERR_PHI_MAX_TOHIGH "Error: 'PHI_MAX' is lower than number of \
-philosophers you provide\n"
+# define ERR_INIT_MUTEX "Error: failed to create mutex\n"
+# define ERR_INIT_THREAD "Error: failed to create thread\n"
 
 # ifdef ALLOC_MODE
+#  define IS_ALLOC true
 #  define ERR_ALLOC "Error: Allocation failed\n"
+# else
+#  define IS_ALLOC false
+#  define ERR_PHI_MAX_TOHIGH "Error: 'PHI_MAX' is lower than number of \
+philosophers you provide\n"
 # endif
 
 typedef enum e_paction
@@ -106,9 +111,9 @@ typedef struct s_data
 }	t_data;
 
 // init
-void		init_philo_and_forks(t_data *d_ptr, t_philo *philos, \
+int16_t		init_philo_and_forks(t_data *d_ptr, t_philo *philos, \
 		t_mutex *forks);
-int32_t		init_data(t_data *d_ptr, int ac, char const *av[]);
+int16_t		init_data(t_data *d_ptr, int ac, char const *av[]);
 
 // routine
 void		*philo_life(void *param);

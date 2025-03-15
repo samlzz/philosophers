@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/28 15:32:18 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/14 14:10:45 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/15 13:30:51 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,8 @@ void	*philo_life(void *param)
 	phi = (t_philo *)param;
 	while (!get_shared(&phi->data->sim_state))
 		ft_usleep(1);
+	if (get_shared(&phi->data->sim_state) == -1)
+		return (NULL);
 	if (phi->id % 2 == 0)
 		ft_usleep(3);
 	else if ((phi->data->count / 2) % 2 == 0)

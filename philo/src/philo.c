@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/14 14:30:32 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/15 13:18:08 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ static void	*meal_monitor(void *param)
 	return (NULL);
 }
 
-static inline void	_destroy_data(t_data *d_ptr, bool alloc_mode)
+static inline void	_destroy_data(t_data *d_ptr)
 {
 	size_t	i;
 
@@ -51,7 +51,7 @@ static inline void	_destroy_data(t_data *d_ptr, bool alloc_mode)
 	pthread_mutex_destroy(&d_ptr->print_mutex);
 	pthread_mutex_destroy(&d_ptr->sim_state.mtx);
 	pthread_mutex_destroy(&d_ptr->sated.mtx);
-	if (alloc_mode)
+	if (IS_ALLOC)
 	{
 		free(d_ptr->philos);
 		free(d_ptr->forks);
@@ -70,12 +70,13 @@ int	main(int argc, char const *argv[])
 
 	if (argc < 5 || argc > 6)
 		return (write(2, ERR_ARG_NB, 160), 1);
-	i = init_data(&data, argc - 1, argv + 1);
+	i = (size_t)init_data(&data, argc - 1, argv + 1);
 	if (i == 2)
 		return (write(2, ERR_PHI_MAX_TOHIGH, 66), 1);
 	else if (i)
 		return (write(2, ERR_INVALID_ARG, 104), 1);
-	init_philo_and_forks(&data, philos, forks);
+	if (init_philo_and_forks(&data, philos, forks))
+		return (1);
 	if (data.must_eat_count != -1)
 	{
 		pthread_create(&monitor, NULL, &meal_monitor, &data);
@@ -84,7 +85,7 @@ int	main(int argc, char const *argv[])
 	i = 0;
 	while (i < data.count)
 		pthread_join(data.philos[i++].thread, NULL);
-	_destroy_data(&data, false);
+	_destroy_data(&data);
 	return (0);
 }
 
@@ -100,23 +101,21 @@ int	main(int argc, char const *argv[])
 
 	if (argc < 5 || argc > 6)
 		return (write(2, ERR_ARG_NB, 160), 1);
-	i = init_data(&data, argc - 1, argv + 1);
-	if (i == 2)
-		return (write(2, ERR_PHI_MAX_TOHIGH, 66), 1);
-	else if (i)
+	if (init_data(&data, argc - 1, argv + 1))
 		return (write(2, ERR_INVALID_ARG, 104), 1);
-	(data.philos = (philos = malloc(data.count * sizeof(t_philo))));
+	philos = malloc(data.count * sizeof(t_philo));
 	forks = malloc(data.count * sizeof(t_mutex));
 	if (!philos || !forks)
-		return (_destroy_data(&data, true) 1);
-	init_philo_and_forks(&data, philos, forks);
+		return (free(philos), free(forks), 1);
+	if (init_philo_and_forks(&data, philos, forks))
+		return (free(philos), free(forks), 1);
 	if (data.must_eat_count != -1)
-		(pthread_create(&monitor, NULL, &monitoring, (void *)&data), \
+		(pthread_create(&monitor, NULL, &monitoring, &data), \
 			pthread_join(monitor, NULL));
 	i = 0;
 	while (i < data.count)
 		pthread_join(data.philos[i++].thread, NULL);
-	return (_destroy_data(&data, true), 0);
+	return (_destroy_data(&data), 0);
 }
 
 #endif

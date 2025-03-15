@@ -6,13 +6,14 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 20:54:03 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/14 14:30:54 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/15 13:30:00 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 #include <string.h>
 #include <limits.h>
+#include <unistd.h>
 
 static inline uint32_t	ascii_to_uint(const char *nptr, int *error)
 {
@@ -40,7 +41,7 @@ static inline uint32_t	ascii_to_uint(const char *nptr, int *error)
 	return ((unsigned int)r);
 }
 
-static inline int	_set_nb_field(char const *nb, int32_t *sign_field, \
+static inline int	_set_nb(char const *nb, int32_t *sign_field, \
 	uint32_t *field)
 {
 	int32_t		has_err;
@@ -59,18 +60,19 @@ static inline int	_set_nb_field(char const *nb, int32_t *sign_field, \
 	return (has_err);
 }
 
-int	init_data(t_data *d_ptr, int ac, char const *av[])
+int16_t	init_data(t_data *d_ptr, int ac, char const *av[])
 {
 	memset(d_ptr, 0, sizeof(t_data));
-	if (_set_nb_field(av[0], NULL, &d_ptr->count) || d_ptr->count > PHI_MAX)
+	if (_set_nb(av[0], NULL, &d_ptr->count) || \
+	(!IS_ALLOC && d_ptr->count > PHI_MAX))
 		return ((d_ptr->count > PHI_MAX) * 2 + !(d_ptr->count > PHI_MAX) * 1);
-	if (_set_nb_field(av[1], NULL, &d_ptr->time_to_die))
+	if (_set_nb(av[1], NULL, &d_ptr->time_to_die))
 		return (1);
-	if (_set_nb_field(av[2], NULL, &d_ptr->time_to_eat))
+	if (_set_nb(av[2], NULL, &d_ptr->time_to_eat))
 		return (1);
-	if (_set_nb_field(av[3], NULL, &d_ptr->time_to_sleep))
+	if (_set_nb(av[3], NULL, &d_ptr->time_to_sleep))
 		return (1);
-	if (ac == 5 && _set_nb_field(av[4], &d_ptr->must_eat_count, NULL))
+	if (ac == 5 && _set_nb(av[4], &d_ptr->must_eat_count, NULL))
 		return (1);
 	if (ac == 4)
 		d_ptr->must_eat_count = -1;
@@ -87,10 +89,13 @@ int	init_data(t_data *d_ptr, int ac, char const *av[])
 	return (0);
 }
 
-static inline void	_init_philos(t_data *d_ptr, t_philo *philos)
+static inline int16_t	_init_philos(t_data *d_ptr, t_philo *philos)
 {
+	bool	have_err;
 	size_t	i;
+	size_t	j;
 
+	have_err = false;
 	i = 0;
 	while (i < d_ptr->count)
 	{
@@ -98,22 +103,44 @@ static inline void	_init_philos(t_data *d_ptr, t_philo *philos)
 		philos[i].left_fork = d_ptr->forks + i;
 		philos[i].right_fork = d_ptr->forks + ((i + 1) % d_ptr->count);
 		philos[i].data = d_ptr;
-		pthread_create(&philos[i].thread, NULL, &philo_life, philos + i);
+		if (pthread_create(&philos[i].thread, NULL, &philo_life, philos + i))
+		{
+			have_err = true;
+			j = 0;
+			set_shared(&d_ptr->sim_state, SH_SET, -1);
+			while (j < i)
+				pthread_join(philos[j++].thread, NULL);
+			break ;
+		}
 		i++;
 	}
+	return (have_err);
 }
 
-void	init_philo_and_forks(t_data *d_ptr, t_philo *philos, t_mutex *forks)
+int16_t	init_philo_and_forks(t_data *d_ptr, t_philo *philos, t_mutex *forks)
 {
 	size_t	i;
+	size_t	j;
 
 	i = 0;
+	j = 0;
 	while (i < d_ptr->count)
-		pthread_mutex_init(forks + i++, NULL);
+	{
+		if (pthread_mutex_init(forks + i, NULL))
+		{
+			while (j < i)
+				pthread_mutex_destroy(forks + j++);
+		}
+		i++;
+	}
+	if (j)
+		return (write(2, ERR_INIT_MUTEX, 30), 1);
 	memset(philos, 0, sizeof(t_philo) * d_ptr->count);
 	d_ptr->forks = forks;
-	_init_philos(d_ptr, philos);
+	if (_init_philos(d_ptr, philos))
+		return (write(2, ERR_INIT_THREAD, 31), 1);
 	d_ptr->philos = philos;
 	d_ptr->start_time = date_now();
 	set_shared(&d_ptr->sim_state, SH_SET, true);
+	return (0);
 }
