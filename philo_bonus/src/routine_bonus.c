@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 14:29:43 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/16 22:22:26 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/16 22:45:30 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ static bool	_eat(t_data data, t_philo *phi)
 	if (_take_forks(*phi, data))
 		return (1);
 	phi->meals++;
-	if (data.must_eat_count != -1 && phi->meals == (unsigned int)data.must_eat_count)
+	if (data.must_eat_count != -1 && phi->meals == (uint32_t)data.must_eat_count)
 		sem_post(data.sem_sated);
 	phi->lst_meal_time = date_now();
 	phi->next_meal_time = phi->lst_meal_time + data.time_to_die;
@@ -53,7 +53,7 @@ static bool	_eat(t_data data, t_philo *phi)
 
 static bool	_sleep(t_philo phi, t_data data)
 {
-	long	curr_time;
+	int64_t	curr_time;
 
 	curr_time = date_now();
 	philog(phi, ACT_SLEEP);
@@ -75,7 +75,7 @@ static bool	_think(t_philo phi, t_data data)
 	return (0);
 }
 
-int	children_process(unsigned int id, t_data data)
+int16_t	children_process(uint32_t id, t_data data)
 {
 	t_philo		philo;
 

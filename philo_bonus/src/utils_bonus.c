@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:41:35 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/16 21:41:50 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/16 22:42:32 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-long	date_now(void)
+int64_t	date_now(void)
 {
 	struct timeval	tv;
 
@@ -23,14 +23,13 @@ long	date_now(void)
 	return (tv.tv_sec * 1000L + tv.tv_usec / 1000);
 }
 
-int	ft_usleep(size_t milliseconds)
+void	ft_usleep(size_t milliseconds)
 {
 	size_t	start;
 
 	start = date_now();
 	while ((date_now() - start) < milliseconds)
 		usleep(USLEEP_INTERVAL);
-	return (0);
 }
 
 void	philog(t_philo owner, t_paction state)

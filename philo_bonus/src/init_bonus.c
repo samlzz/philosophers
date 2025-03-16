@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 12:56:14 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/16 21:54:54 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/16 22:43:06 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,9 @@
 #include <signal.h>
 #include <fcntl.h>
 
-static inline unsigned int	_ascii_to_uint(const char *nptr, int *error)
+static inline uint32_t	_ascii_to_uint(const char *nptr, int *error)
 {
-	unsigned long	r;
+	uint64_t	r;
 
 	r = 0;
 	*error = 0;
@@ -40,13 +40,13 @@ static inline unsigned int	_ascii_to_uint(const char *nptr, int *error)
 	}
 	if (*nptr)
 		*error = 1;
-	return ((unsigned int)r);
+	return ((uint32_t)r);
 }
 
-static int	_set_nb_field(char const *nb, int *sign_field, unsigned int *field)
+static int16_t	_set_nb_field(char const *nb, int *sign_field, uint32_t *field)
 {
-	int				has_err;
-	unsigned int	value;
+	int16_t		has_err;
+	uint32_t	value;
 
 	has_err = 0;
 	value = ascii_to_uint(nb, &has_err);
@@ -61,7 +61,7 @@ static int	_set_nb_field(char const *nb, int *sign_field, unsigned int *field)
 	return (has_err);
 }
 
-int	init_data(t_data *d_ptr, int ac, char const *av[])
+int16_t	init_data(t_data *d_ptr, int32_t ac, char const *av[])
 {
 	memset(d_ptr, 0, sizeof(t_data));
 	if (_set_nb_field(av[0], NULL, &d_ptr->count))
@@ -79,7 +79,7 @@ int	init_data(t_data *d_ptr, int ac, char const *av[])
 	return (0);
 }
 
-static inline int	open_semaphores(t_data *d_ptr)
+static inline int16_t	open_semaphores(t_data *d_ptr)
 {
 	d_ptr->sem_end = sem_open(SEM_END, O_CREAT, 0644, 0);
 	if (d_ptr->sem_end == SEM_FAILED)
