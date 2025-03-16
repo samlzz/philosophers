@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 20:54:03 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/15 13:30:00 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/16 17:41:13 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,8 +135,8 @@ int16_t	init_philo_and_forks(t_data *d_ptr, t_philo *philos, t_mutex *forks)
 	}
 	if (j)
 		return (write(2, ERR_INIT_MUTEX, 30), 1);
-	memset(philos, 0, sizeof(t_philo) * d_ptr->count);
 	d_ptr->forks = forks;
+	memset(philos, 0, sizeof(t_philo) * d_ptr->count);
 	if (_init_philos(d_ptr, philos))
 		return (write(2, ERR_INIT_THREAD, 31), 1);
 	d_ptr->philos = philos;

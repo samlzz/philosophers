@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/15 15:26:19 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/16 17:46:54 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ static inline void	_destroy_data(t_data *d_ptr)
 	}
 }
 
-static inline int16_t	_launch_sim(t_data *dptr)
+static inline int16_t	_run_simulation(t_data *dptr)
 {
 	size_t		i;
 	pthread_t	monitor;
@@ -70,14 +70,14 @@ static inline int16_t	_launch_sim(t_data *dptr)
 	if (pthread_create(&monitor, NULL, &meal_monitor, dptr))
 	{
 		set_shared(&dptr->sim_state, SH_SET, false);
-		pthread_join(monitor, NULL);
 		exit = 1;
 	}
 	else
-		pthread_detach(&monitor);
+		pthread_detach(monitor);
 	i = 0;
 	while (i < dptr->count)
 		pthread_join(dptr->philos[i++].thread, NULL);
+	_destroy_data(dptr);
 	return (exit);
 }
 
@@ -98,10 +98,11 @@ int	main(int argc, char const *argv[])
 	else if (exit_code)
 		return (write(2, ERR_INVALID_ARG, 104), 1);
 	if (init_philo_and_forks(&data, philos, forks))
+	{
+		_destroy_data(&data);
 		return (1);
-	exit_code = _launch_sim(&data);
-	_destroy_data(&data);
-	return (exit_code);
+	}
+	return (_run_simulation(&data));
 }
 
 #else
@@ -111,7 +112,6 @@ int	main(int argc, char const *argv[])
 	t_data		data;
 	t_philo		*philos;
 	t_mutex		*forks;
-	int16_t		exit_code;
 
 	if (argc < 5 || argc > 6)
 		return (write(2, ERR_ARG_NB, 160), 1);
@@ -122,9 +122,14 @@ int	main(int argc, char const *argv[])
 	if (!philos || !forks)
 		return (free(philos), free(forks), 1);
 	if (init_philo_and_forks(&data, philos, forks))
-		return (free(philos), free(forks), 1);
-	exit_code = _launch_sim(&data);
-	return (_destroy_data(&data), exit_code);
+	{
+		if (!data.forks)
+			free(forks);
+		free(philos);
+		_destroy_data(&data);
+		return (1);
+	}
+	return (_run_simulation(&data));
 }
 
 #endif

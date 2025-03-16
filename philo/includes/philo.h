@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/15 13:17:31 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/16 17:23:55 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,8 @@ typedef struct s_data
 	t_mutex		*forks;
 	t_philo		*philos;
 }	t_data;
+
+void	destroy_data(t_data *d_ptr);
 
 // init
 int16_t		init_philo_and_forks(t_data *d_ptr, t_philo *philos, \
