@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 12:56:14 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/11 17:34:34 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/16 21:54:54 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,17 +90,21 @@ static inline int	open_semaphores(t_data *d_ptr)
 	d_ptr->sem_print = sem_open(SEM_PRINT, O_CREAT, 0644, 1);
 	if (d_ptr->sem_print == SEM_FAILED)
 		return (close_sems(d_ptr), 1);
-	d_ptr->sem_meals_finished = sem_open(SEM_MEALS, O_CREAT, 0644, 0);
-	if (d_ptr->sem_meals_finished == SEM_FAILED)
-		return(close_sems(d_ptr), 1);
+	if (d_ptr->must_eat_count != -1)
+	{
+		d_ptr->sem_sated = sem_open(SEM_MEALS, O_CREAT, 0644, 0);
+		if (d_ptr->sem_sated == SEM_FAILED)
+			return(close_sems(d_ptr), 1);
+	}
 	d_ptr->forks = sem_open(SEM_FORKS, O_CREAT, 0644, d_ptr->count);
 	if (d_ptr->forks == SEM_FAILED)
 		return(close_sems(d_ptr), 1);
-	(sem_unlink(SEM_END), \
-	sem_unlink(SEM_START), \
-	sem_unlink(SEM_PRINT), \
-	sem_unlink(SEM_FORKS), \
-	sem_unlink(SEM_MEALS));
+	sem_unlink(SEM_END);
+	sem_unlink(SEM_START);
+	sem_unlink(SEM_PRINT);
+	sem_unlink(SEM_FORKS);
+	if (d_ptr->sem_sated)
+		sem_unlink(SEM_MEALS);
 	return (0);
 }
 

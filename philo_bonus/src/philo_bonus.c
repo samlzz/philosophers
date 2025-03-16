@@ -6,22 +6,22 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 12:46:40 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/11 17:39:41 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/16 22:21:26 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_bonus.h"
 #include <stdlib.h>
 #include <signal.h>
-#include <fcntl.h>
 #include <sys/wait.h>
-#include <pthread.h>	
+#include <pthread.h>
 #include <stdio.h>
 
-static void	_wait_childrens(pid_t *childs, size_t count)
+static inline void	_wait_childrens(pid_t *childs, size_t count, sem_t *end)
 {
 	size_t	i;
 
+	sem_wait(end);
 	i = 0;
 	while (i < count)
 		kill(childs[i++], SIGKILL);
@@ -31,29 +31,26 @@ static void	_wait_childrens(pid_t *childs, size_t count)
 	free(childs);
 }
 
-void	*meal_monitor(void *param)
+void	*monitor(void *param)
 {
 	t_data	*data;
 	size_t	i;
 
 	data = (t_data *)param;
 	i = 0;
-	while (i < data->count)
-	{
+	while (i++ < data->count)
 		sem_post(data->sem_start);
-		i++;
-	}
 	data->start_time = date_now();
+	if (data->must_eat_count == -1)
+		return (NULL);
 	i = 0;
-	while (i < data->count)
-	{
-		sem_wait(data->sem_meals_finished);
-		i++;
-	}
-	usleep(MONITOR_DELAY);
+	while (i++ < data->count)
+		sem_wait(data->sem_sated);
+	sem_wait(data->sem_print);
 	printf("%ld All philosophers have eaten enough.\n", \
 		date_now() - data->start_time);
 	sem_post(data->sem_end);
+	sem_post(data->sem_print);
 	return (NULL);
 }
 
@@ -72,12 +69,10 @@ int	main(int argc, char const *argv[])
 	}
 	childs = init_childs(&data);
 	if (!childs)
-		return (destroy_data(NULL), 1);
-	if (data.must_eat_count != -1)
-		(pthread_create(&monitor, NULL, &meal_monitor, &data), \
-			pthread_detach(monitor));
-	sem_wait(data.sem_end);
-	_wait_childrens(childs, data.count);
+		return (1);
+	pthread_create(&monitor, NULL, &monitor, &data);
+	pthread_detach(monitor);
+	_wait_childrens(childs, data.count, data.sem_end);
 	close_sems(&data);
 	return (0);	
 }
