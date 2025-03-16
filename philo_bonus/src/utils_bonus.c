@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:41:35 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/11 17:22:12 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/16 21:41:50 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,8 +57,8 @@ void	close_sems(t_data *d_ptr)
 		sem_close(d_ptr->sem_start);
 	if (d_ptr->sem_print)
 		sem_close(d_ptr->sem_print);
-	if (d_ptr->sem_meals_finished)
-		sem_close(d_ptr->sem_meals_finished);
+	if (d_ptr->sem_sated)
+		sem_close(d_ptr->sem_sated);
 	if (d_ptr->forks)
 		sem_close(d_ptr->forks);
 }
