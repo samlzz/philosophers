@@ -6,19 +6,27 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 14:29:43 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/11 17:33:16 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/16 22:22:26 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_bonus.h"
-#include <pthread.h>
 
-static inline bool	_check_death(t_philo phi)
+static inline bool	_take_forks(t_philo phi, t_data data)
 {
-	if (date_now() - phi.lst_meal_time >= phi.__dptr->time_to_die)
+	sem_wait(data.forks);
+	philog(phi, ACT_FORK);
+	if (date_now() >= phi.next_meal_time)
 	{
-		sem_post(phi.__dptr->sem_end);
-		philog(phi, ACT_DIE);
+		sem_post(data.forks);
+		return (1);
+	}
+	sem_wait(data.forks);
+	philog(phi, ACT_FORK);
+	if (date_now() >= phi.next_meal_time)
+	{
+		sem_post(data.forks);
+		sem_post(data.forks);
 		return (1);
 	}
 	return (0);
@@ -26,26 +34,21 @@ static inline bool	_check_death(t_philo phi)
 
 static bool	_eat(t_data data, t_philo *phi)
 {
-	sem_wait(data.forks);
-	philog(*phi, ACT_FORK);
-	if (_check_death(*phi))
+	if (_take_forks(*phi, data))
 		return (1);
-	sem_wait(data.forks);
-	philog(*phi, ACT_FORK);
-	if (_check_death(*phi))
-		return (1);
-	philog(*phi, ACT_EAT);
+	phi->meals++;
+	if (data.must_eat_count != -1 && phi->meals == (unsigned int)data.must_eat_count)
+		sem_post(data.sem_sated);
 	phi->lst_meal_time = date_now();
 	phi->next_meal_time = phi->lst_meal_time + data.time_to_die;
+	philog(*phi, ACT_EAT);
 	if (phi->lst_meal_time + data.time_to_eat >= phi->next_meal_time)
 		ft_usleep(phi->next_meal_time - phi->lst_meal_time);
 	else
 		ft_usleep(data.time_to_eat);
-	if (++phi->meals == (unsigned int)data.must_eat_count)
-		sem_post(data.sem_meals_finished);
 	sem_post(data.forks);
 	sem_post(data.forks);
-	return (0);
+	return (date_now() >= phi->next_meal_time);
 }
 
 static bool	_sleep(t_philo phi, t_data data)
@@ -66,8 +69,6 @@ static bool	_sleep(t_philo phi, t_data data)
 
 static bool	_think(t_philo phi, t_data data)
 {
-	if (_check_death(phi))
-		return (1);
 	philog(phi, ACT_THINK);
 	if (data.count % 2)
 		ft_usleep((phi.next_meal_time - date_now()) / 3);
@@ -92,12 +93,11 @@ int	children_process(unsigned int id, t_data data)
 			_sleep(philo, data) || \
 			_think(philo, data))
 		{
+			philog(philo, ACT_DIE);
+			sem_post(data.sem_end);
 			break ;
 		}
 	}
-	sem_close(data.sem_end);
-	sem_close(data.sem_print);
-	sem_close(data.forks);
-	sem_close(data.sem_meals_finished);
+	close_sems(&data);
 	return (0);
 }
