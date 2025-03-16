@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/28 15:32:18 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/15 13:30:51 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/16 22:22:09 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,6 @@ static inline bool	_take_forks(t_philo *phi)
 
 static bool	_eat(t_philo *phi)
 {
-	bool	exit;
-
 	if (_take_forks(phi))
 		return (1);
 	phi->meals_eaten++;
@@ -62,8 +60,7 @@ static bool	_eat(t_philo *phi)
 		ft_usleep(phi->data->time_to_eat);
 	pthread_mutex_unlock(phi->left_fork);
 	pthread_mutex_unlock(phi->right_fork);
-	exit = date_now() >= phi->next_meal_time;
-	return (exit);
+	return (date_now() >= phi->next_meal_time);
 }
 
 static bool	_sleep(t_philo *phi)
