@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 12:46:40 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/16 22:43:35 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/18 15:49:57 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ static inline void	_wait_childrens(pid_t *childs, size_t count, sem_t *end)
 	free(childs);
 }
 
-void	*monitor(void *param)
+void	*monitoring(void *param)
 {
 	t_data	*data;
 	size_t	i;
@@ -70,7 +70,7 @@ int	main(int argc, char const *argv[])
 	childs = init_childs(&data);
 	if (!childs)
 		return (1);
-	pthread_create(&monitor, NULL, &monitor, &data);
+	pthread_create(&monitor, NULL, &monitoring, &data);
 	pthread_detach(monitor);
 	_wait_childrens(childs, data.count, data.sem_end);
 	close_sems(&data);

@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 12:56:14 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/16 22:43:06 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/18 15:49:33 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <signal.h>
 #include <fcntl.h>
 
-static inline uint32_t	_ascii_to_uint(const char *nptr, int *error)
+static inline uint32_t	_ascii_to_uint(const char *nptr, int16_t *error)
 {
 	uint64_t	r;
 
@@ -49,7 +49,7 @@ static int16_t	_set_nb_field(char const *nb, int *sign_field, uint32_t *field)
 	uint32_t	value;
 
 	has_err = 0;
-	value = ascii_to_uint(nb, &has_err);
+	value = _ascii_to_uint(nb, &has_err);
 	if (sign_field)
 	{
 		if (value > INT_MAX || !value)
