@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 20:54:03 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/16 17:41:13 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/24 20:04:16 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ int16_t	init_data(t_data *d_ptr, int ac, char const *av[])
 		return (1);
 	if (pthread_mutex_init(&d_ptr->sim_state.mtx, NULL))
 		return (pthread_mutex_destroy(&d_ptr->print_mutex), 1);
-	if (pthread_mutex_init(&d_ptr->sated.mtx, NULL))
+	if (ac == 5 && pthread_mutex_init(&d_ptr->sated.mtx, NULL))
 	{
 		pthread_mutex_destroy(&d_ptr->print_mutex);
 		pthread_mutex_destroy(&d_ptr->sim_state.mtx);

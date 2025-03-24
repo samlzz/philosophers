@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/16 17:46:54 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/24 20:00:09 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,8 @@ static inline void	_destroy_data(t_data *d_ptr)
 	}
 	pthread_mutex_destroy(&d_ptr->print_mutex);
 	pthread_mutex_destroy(&d_ptr->sim_state.mtx);
-	pthread_mutex_destroy(&d_ptr->sated.mtx);
+	if (d_ptr->must_eat_count != -1)
+		pthread_mutex_destroy(&d_ptr->sated.mtx);
 	if (IS_ALLOC)
 	{
 		free(d_ptr->philos);
@@ -64,16 +65,17 @@ static inline int16_t	_run_simulation(t_data *dptr)
 	pthread_t	monitor;
 	int16_t		exit;
 
-	if (dptr->must_eat_count == -1)
-		return (0);
-	exit = 0;
-	if (pthread_create(&monitor, NULL, &meal_monitor, dptr))
+	if (dptr->must_eat_count != -1)
 	{
-		set_shared(&dptr->sim_state, SH_SET, false);
-		exit = 1;
+		exit = 0;
+		if (pthread_create(&monitor, NULL, &meal_monitor, dptr))
+		{
+			set_shared(&dptr->sim_state, SH_SET, false);
+			exit = 1;
+		}
+		else
+			pthread_detach(monitor);
 	}
-	else
-		pthread_detach(monitor);
 	i = 0;
 	while (i < dptr->count)
 		pthread_join(dptr->philos[i++].thread, NULL);
