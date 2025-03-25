@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/28 15:32:18 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/16 22:22:09 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/25 18:01:11 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,27 +15,21 @@
 
 static inline bool	_take_forks(t_philo *phi)
 {
-	t_mutex	*one;
-	t_mutex	*two;
-
-	one = phi->left_fork;
-	two = phi->right_fork;
-	if (phi->id % 2)
-	{
-		one = phi->right_fork;
-		two = phi->left_fork;
-	}
-	pthread_mutex_lock(one);
+	pthread_mutex_lock(phi->right_fork);
 	philog(*phi, ACT_FORK);
-	if (one == two || \
-		date_now() >= phi->next_meal_time)
-		return (pthread_mutex_unlock(one), 1);
-	pthread_mutex_lock(two);
+	if (phi->right_fork == phi->left_fork || date_now() >= phi->next_meal_time)
+	{
+		pthread_mutex_unlock(phi->right_fork);
+		if (phi->right_fork == phi->left_fork)
+			ft_usleep(phi->next_meal_time - date_now());
+		return (1);
+	}
+	pthread_mutex_lock(phi->left_fork);
 	philog(*phi, ACT_FORK);
 	if (date_now() >= phi->next_meal_time)
 	{
-		pthread_mutex_unlock(one);
-		pthread_mutex_unlock(two);
+		pthread_mutex_unlock(phi->right_fork);
+		pthread_mutex_unlock(phi->left_fork);
 		return (1);
 	}
 	return (0);
@@ -73,8 +67,7 @@ static bool	_sleep(t_philo *phi)
 	philog(*phi, ACT_SLEEP);
 	if (curr_time + phi->data->time_to_sleep >= phi->next_meal_time)
 	{
-		if (curr_time > phi->next_meal_time)
-			ft_usleep(phi->next_meal_time - curr_time);
+		ft_usleep(phi->next_meal_time - date_now());
 		return (1);
 	}
 	ft_usleep(phi->data->time_to_sleep);
@@ -109,8 +102,9 @@ void	*philo_life(void *param)
 	{
 		if (_eat(phi) || _sleep(phi) || _think(phi))
 		{
-			philog(*phi, ACT_DIE);
-			set_shared(&phi->data->sim_state, SH_SET, false);
+			if (get_shared(&phi->data->sim_state))
+				(philog(*phi, ACT_DIE), \
+					set_shared(&phi->data->sim_state, SH_SET, false));
 			break ;
 		}
 	}
