@@ -348,7 +348,7 @@ check_exec() {
 	input=${input:-y}
 	if [[ "$input" =~ ^[yY]$ ]]; then
 		printf "$RED${R_BD}Deleted files:\n$NC"
-		mapfile -t deleted_files < <(find "./$LOG_DIR"/* -delete -print)
+		mapfile -t deleted_files < <(find "./$LOG_DIR"/* -delete -print 2> /dev/null)
 		if [[ "${#deleted_files[@]}" -gt 1 ]]; then
 			for ((i = 0; i < ${#deleted_files[@]}; i++)); do
 				if ((i == 0)); then
