@@ -55,9 +55,9 @@ endif
 
 #? get some size for compilation (see philo.h)
 STACK_SIZE := $(shell echo $$(($(shell ulimit -s) * 1024)))
-MUTEX_SIZE := $(shell echo -e '#include <pthread.h>\n#include <stdio.h>\nint main() { printf("%zu", sizeof(pthread_mutex_t)); return 0; }' | cc -xc - -o /tmp/get_size && /tmp/get_size)
-PHILO_SIZE := $(shell echo -e '#include "includes/philo.h"\n#include <stdio.h>\nint main() { printf("%zu", sizeof(struct s_philo)); return 0; }' | cc -xc - -Iincludes -DALLOC_MODE -o /tmp/get_size && /tmp/get_size)
-DATA_SIZE := $(shell echo -e '#include "includes/philo.h"\n#include <stdio.h>\nint main() { printf("%zu", sizeof(struct s_data)); return 0; }' | cc -xc - -Iincludes -DALLOC_MODE -o /tmp/get_size && /tmp/get_size)
+MUTEX_SIZE := $(shell printf '#include <pthread.h>\n#include <stdio.h>\nint main() { printf("%%zu", sizeof(pthread_mutex_t)); return 0; }' | cc -xc - -o /tmp/get_size && /tmp/get_size)
+PHILO_SIZE := $(shell printf '#include "includes/philo.h"\n#include <stdio.h>\nint main() { printf("%%zu", sizeof(struct s_philo)); return 0; }' | cc -xc - -Iincludes -DALLOC_MODE -o /tmp/get_size && /tmp/get_size)
+DATA_SIZE  := $(shell printf '#include "includes/philo.h"\n#include <stdio.h>\nint main() { printf("%%zu", sizeof(struct s_data)); return 0; }' | cc -xc - -Iincludes -DALLOC_MODE -o /tmp/get_size && /tmp/get_size)
 
 CFLAGS +=  -DSTACK_SIZE=$(STACK_SIZE) \
 			-DMUTEX_SIZE=$(MUTEX_SIZE) \
