@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/28 15:32:18 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/26 16:08:15 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/26 17:01:34 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,16 @@ static bool	_eat(t_philo *phi)
 	{
 		set_shared(&phi->data->sated, SH_INCREMENT, 1);
 	}
+	now = date_now() - phi->data->start_time;
+	next_die = phi->next_meal_time - phi->data->start_time;
+	if (now + phi->data->time_to_eat >= next_die)
+		ft_usleep(next_die - now);
+	else
+		ft_usleep(phi->data->time_to_eat);
+	pthread_mutex_unlock(phi->left_fork);
+	pthread_mutex_unlock(phi->right_fork);
+	if (now + phi->data->time_to_eat >= next_die)
+		return (1);
 	phi->last_meal_time = date_now();
 	phi->next_meal_time = phi->last_meal_time + phi->data->time_to_die;
 	return (0);
