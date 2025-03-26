@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:41:35 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/14 14:09:42 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/26 13:35:11 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void	ft_usleep(size_t milliseconds)
 		usleep(USLEEP_INTERVAL);
 }
 
-void	philog(t_philo phi, t_paction state)
+void	philog(t_philo phi, t_paction state, t_mtx_act action)
 {
 	long	time;
 	char	*strs[ACT_DIE + 1];
@@ -44,9 +44,11 @@ void	philog(t_philo phi, t_paction state)
 	strs[ACT_SLEEP] = "is sleeping";
 	strs[ACT_THINK] = "is thinking";
 	strs[ACT_DIE] = "died";
-	pthread_mutex_lock(&phi.data->print_mutex);
+	if (action == MX_LOCK || action == MX_BOTH)
+		pthread_mutex_lock(&phi.data->print_mutex);
 	printf("%ld %d %s\n", time - phi.data->start_time, phi.id, strs[state]);
-	pthread_mutex_unlock(&phi.data->print_mutex);
+	if (action == MX_UNLOCK || action == MX_BOTH)
+		pthread_mutex_unlock(&phi.data->print_mutex);
 }
 
 void	set_shared(t_shared	*__ptr, t_shared_ope ope, int32_t value)

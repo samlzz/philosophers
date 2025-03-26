@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/16 21:36:55 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/26 13:50:48 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,14 @@ unsigned int (the last one need to be greater than 0)\n"
 #  define ERR_PHI_MAX_TOHIGH "Error: 'PHI_MAX' is lower than number of \
 philosophers you provide\n"
 # endif
+
+typedef enum e_mtx_act
+{
+	MX_LOCK,
+	MX_UNLOCK,
+	MX_BOTH,
+	MX_NONE
+}	t_mtx_act;
 
 typedef enum e_paction
 {
@@ -120,7 +128,7 @@ void		*philo_life(void *param);
 
 // utils
 uint64_t	date_now(void);
-void		philog(t_philo phi, t_paction state);
+void		philog(t_philo phi, t_paction state, t_mtx_act action);
 void		ft_usleep(size_t milliseconds);
 void		set_shared(t_shared	*__ptr, t_shared_ope ope, int32_t value);
 int32_t		get_shared(t_shared *from);
