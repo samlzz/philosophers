@@ -190,9 +190,8 @@ _check_interval_between_actions() {
 check_interval() {
 	local id="$1"
 
-	local to_eat
+	local to_eat to_sleep
 	to_eat=$(echo "$ARGS" | awk '{print $3}')
-	local to_sleep
 	to_sleep=$(echo "$ARGS" | awk '{print $4}')
 	if _check_interval_between_actions "$id" "$to_eat" "is eating" "is sleeping"; then
 		return 0
@@ -207,11 +206,9 @@ check_interval() {
 _check_death_timing() {
 	local to_die="$1"
 
-	local death_ln
+	local death_ln deatj last_meal
 	death_ln=$(echo "$output" | grep "died" | tail -n1)
-	local death
 	death=$(awk '{print $1}' <<<"$death_ln")
-	local last_meal
 	last_meal=$(echo "$output" | grep "$(awk '{print $2}' <<<"$death_ln") is eating" | tail -n1 | awk '{print $1}')
 
 	if [[ -n "$last_meal" && -n "$death" ]]; then
@@ -224,6 +221,49 @@ _check_death_timing() {
 	fi
 	return 1
 }
+_check_death_timing() {
+	local to_die="$1"
+	local to_eat="$2"
+
+	local death_ln death id
+	death_ln=$(echo "$output" | grep "died" | tail -n1)
+	death=$(awk '{print $1}' <<<"$death_ln")
+	id=$(awk '{print $2}' <<<"$death_ln")
+
+	if [[ -z "$death" || -z "$id" ]]; then
+		herror "Could not extract death timestamp or philosopher ID"
+		return 0
+	fi
+
+	local meals
+	mapfile -t meals < <(echo "$output" | grep " $id is eating" | awk '{print $1}')
+
+	if [[ "${#meals[@]}" -eq 0 ]]; then
+		herror "Philosopher $id died without ever eating"
+		return 0
+	fi
+
+	local last_meal delay diff
+	last_meal="${meals[-1]}"
+	delay=$((death - last_meal))
+
+	if (( delay < to_eat )); then
+		if [[ "${#meals[@]}" -eq 1 ]]; then
+			last_meal=0
+		else
+			last_meal="${meals[-2]}"
+		fi
+		delay=$((death - last_meal))
+	fi
+
+	diff=$((delay - to_die))
+	if [[ "${diff#-}" -gt "$ALLOWED_DELAY" ]]; then
+		herror "Philosopher $id died ${delay}ms after last meal (expected ~${to_die}ms)"
+		return 0
+	fi
+	return 1
+}
+
 
 #`run_test_alive_infinite` & `run_test_alive_sated`
 _check_if_any_die() {
@@ -283,7 +323,8 @@ run_test_die() {
 		return
 	fi
 
-	if _check_death_timing "$(echo "$ARGS" | awk '{print $2}')"; then return; fi
+	if _check_death_timing "$(awk '{print $2}' <<< "$ARGS")" "$(awk '{print $3}' <<< "$ARGS")"
+	then return;	fi
 
 	log_ok
 }
