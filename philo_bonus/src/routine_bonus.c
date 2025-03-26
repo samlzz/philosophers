@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 14:29:43 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/16 22:45:30 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/25 23:00:48 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,11 @@ static inline bool	_take_forks(t_philo phi, t_data data)
 {
 	sem_wait(data.forks);
 	philog(phi, ACT_FORK);
-	if (date_now() >= phi.next_meal_time)
+	if (data.count == 1 || date_now() >= phi.next_meal_time)
 	{
 		sem_post(data.forks);
+		if (data.count == 1)
+			ft_usleep(phi.next_meal_time - date_now());
 		return (1);
 	}
 	sem_wait(data.forks);
@@ -59,8 +61,7 @@ static bool	_sleep(t_philo phi, t_data data)
 	philog(phi, ACT_SLEEP);
 	if (curr_time + data.time_to_sleep >= phi.next_meal_time)
 	{
-		if (curr_time > phi.next_meal_time)
-			ft_usleep(phi.next_meal_time - curr_time);
+		ft_usleep(phi.next_meal_time - curr_time);
 		return (1);
 	}
 	ft_usleep(data.time_to_sleep);
@@ -93,8 +94,8 @@ int16_t	children_process(uint32_t id, t_data data)
 			_sleep(philo, data) || \
 			_think(philo, data))
 		{
-			philog(philo, ACT_DIE);
 			sem_post(data.sem_end);
+			philog(philo, ACT_DIE);
 			break ;
 		}
 	}

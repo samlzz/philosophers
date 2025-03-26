@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:41:35 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/16 22:42:32 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/25 22:48:55 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	philog(t_philo owner, t_paction state)
 	strs[ACT_EAT] = "is eating";
 	strs[ACT_SLEEP] = "is sleeping";
 	strs[ACT_THINK] = "is thinking";
-	strs[ACT_DIE] = "is died";
+	strs[ACT_DIE] = "died";
 	sem_wait(owner.__dptr->sem_print);
 	printf("%ld %d %s\n", time, owner.id, strs[state]);
 	sem_post(owner.__dptr->sem_print);
