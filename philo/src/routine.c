@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/28 15:32:18 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/27 12:49:03 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/27 13:56:28 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,9 +119,11 @@ void	*philo_life(void *param)
 			if (phi->data->sim_state.__val)
 			{
 				phi->data->sim_state.__val = false;
+				pthread_mutex_unlock(&phi->data->sim_state.mtx);
 				philog(*phi, ACT_DIE, MX_BOTH);
 			}
-			pthread_mutex_unlock(&phi->data->sim_state.mtx);
+			else
+				pthread_mutex_unlock(&phi->data->sim_state.mtx);
 			break ;
 		}
 	}
