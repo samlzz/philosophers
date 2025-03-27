@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 12:56:14 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/18 15:49:33 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/27 18:18:40 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,8 @@ pid_t	*init_childs(t_data *data)
 	{
 		childs[i] = fork();
 		if (!childs[i])
-			exit(children_process(i + 1, *data));
+			(children_process(i + 1, *data), \
+				free(childs), exit(0));
 		else if (childs[i] == -1)
 		{
 			while (i > 0)
