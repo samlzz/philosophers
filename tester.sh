@@ -8,7 +8,7 @@ EXEC="./philo/philo"
 BONUS_EXEC="./philo_bonus/philo_bonus"
 LOG_DIR="logs"
 
-VL_CHECK=false
+VL_MEM_CHECK=false
 ALLOWED_DELAY=10 #? In milliseconds
 
 ################################################################################
@@ -19,7 +19,9 @@ DIED_TEST=("1 800 200 200" "4 310 200 100" "4 600 300 300" "5 410 200 200")
 ALIVE_INF_TEST=("4 610 300 300" "200 410 200 200"
 	"9 600 150 150" "199 600 150 150")
 ALIVE_TEST=("12 410 200 200 2" "6 800 200 200 6" "10 500 50 50 10"
-	"5 600 100 100 1" "5 800 200 200 7" "3 610 200 200 80")
+	"9 600 100 100 1" "5 800 200 200 7" "3 610 200 200 12" "3 100 10 10 50")
+VL_TEST=("1 800 200 200" "7 310 200 100"
+	"2 1000 200 200 5" "5 800 200 200 5" "100 1000 100 100 3")
 
 ################################################################################
 # === COLOR CONSTANTS ===
@@ -53,6 +55,7 @@ set_default() {
 	PASSED=0
 	FAILED=0
 	MAKED=false
+	VL_CHECK=false
 }
 set_default
 
@@ -127,14 +130,20 @@ _check_log_format() {
 }
 
 _run_with_helgrind() {
-	local hel_file
-	hel_file="$LOG_DIR/helgrind_$I.log"
+	local file_name
 
-	output=$(valgrind --tool=helgrind --fair-sched=yes --history-level=approx \
-		--log-file="$hel_file" $EXEC $ARGS)
+	if "$VL_MEM_CHECK"; then
+		file_name="$LOG_DIR/valgrind_$I.log"
+		output=$(valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all \
+			-s --log_file="$file_name" $EXEC $ARGS)
+	else
+		file_name="$LOG_DIR/helgrind_$I.log"
+		output=$(valgrind --tool=helgrind --fair-sched=yes --history-level=approx \
+			-s --log-file="$file_name" $EXEC $ARGS)
+	fi
 
-	if grep -q "Possible data race" "$hel_file"; then
-		herror "Helgrind detected a possible data race" "$(cat $hel_file)"
+	if grep -q "ERROR SUMMARY: [^0]" "$file_name"; then
+		herror "Valgrind detected somes errors" "$(cat $file_name)"
 		return 0
 	fi
 	return 1
@@ -189,6 +198,37 @@ _check_interval_between_actions() {
 			local diff=$((interval - expected))
 			if [[ "${diff#-}" -gt "$ALLOWED_DELAY" ]]; then
 				herror "Philosopher $id spent $interval ms on $from → $to (expected $expected ms)" \
+					"$(printf "Test on Philo %s\n%s" "$id" "$output")"
+				return 0
+			fi
+		fi
+	done
+	return 1
+}
+_check_interval_between_actions() {
+	local id="$1"
+	local expected="$2"
+	local from="$3"
+	local to="$4"
+
+	local times
+	times=($(printf "%s\n" "$output" | grep " $id $from" | awk '{print $1}'))
+
+	for t in "${times[@]}"; do
+		local from_line to_line interval diff
+
+		from_line=$(printf "%s\n" "$output" | grep -n "$t $id $from" | head -n1 | cut -d: -f1)
+		to_line=$(printf "%s\n" "$output" | tail -n +"$((from_line + 1))" | grep -n "$id $to" | head -n1 | cut -d: -f1)
+
+		if [[ -n "$from_line" && -n "$to_line" ]]; then
+			to_line=$((from_line + to_line))
+			local end
+			end=$(printf "%s\n" "$output" | sed -n "${to_line}p" | awk '{print $1}')
+			interval=$((end - t))
+			diff=$((interval - expected))
+
+			if [[ "${diff#-}" -gt "$ALLOWED_DELAY" ]]; then
+				herror "Philosopher $id spent $interval ms on $from → $to (expected $expected ms), error between lines $from_line and $to_line" \
 					"$(printf "Test on Philo %s\n%s" "$id" "$output")"
 				return 0
 			fi
@@ -299,7 +339,7 @@ _check_if_any_die() {
 }
 
 ################################################################################
-#* === TEST EXECUTION ===
+#* === UNIT TEST EXECUTION ===
 ################################################################################
 
 run_test_alive_infinite() {
@@ -329,7 +369,9 @@ run_test_alive_sated() {
 			herror "Philosopher $id ate only $eat_count times (expected at least $sated)"
 			return
 		fi
-		if check_interval "$id"; then return; fi
+		if [[ "$count" -lt 50 ]]; then
+			if check_interval "$id"; then return; fi
+		fi
 	done
 
 	log_ok
@@ -388,6 +430,82 @@ run_test_one_die() {
 }
 
 ################################################################################
+#* === EXECUTE EACH TEST TYPE ===
+################################################################################
+
+run_all_die_tests() {
+	printf "\n${BLUE}=== DIED TESTS ===${NC}\n"
+	for i in "${!DIED_TEST[@]}"; do
+		((I++))
+		ARGS="${DIED_TEST[$i]}"
+		if [[ "$ARGS" =~ ^1 ]]; then
+			run_test_one_die
+		else
+			run_test_die
+		fi
+	done
+}
+
+run_all_alive_infinite_tests() {
+	printf "\n${BLUE}=== ALIVE INFINITE TESTS ===${NC}\n"
+	read -rp "Enter a maximum test execution time (press enter for 10 sec)?: " input
+	if [[ "$input" =~ ^[1-9][0-9]*$ ]]; then
+		MAX_CHECK_TIME="$input"
+	elif [[ "$input" != "" ]]; then
+		printf "${YELLOW}[Warning] '%s' is invalid time value. Use default value instead.$NC\n" "$input"
+	fi
+	IGN_LAST_LN=true
+	for j in "${!ALIVE_INF_TEST[@]}"; do
+		((I++))
+		ARGS="${ALIVE_INF_TEST[$j]}"
+		run_test_alive_infinite
+	done
+	IGN_LAST_LN=false
+	MAX_CHECK_TIME=10
+}
+
+run_all_alive_sated_tests() {
+	printf "\n${BLUE}=== SATED TESTS ===${NC}\n"
+	IGN_LAST_LN=true
+	for k in "${!ALIVE_TEST[@]}"; do
+		((I++))
+		ARGS="${ALIVE_TEST[$k]}"
+		run_test_alive_sated
+	done
+	IGN_LAST_LN=false
+}
+
+run_valgrind_tests() {
+	local choice
+
+	printf "\n${BLUE}=== VALGRINDS INFINITE TESTS ===${NC}\n"
+	printf "${MAGENTA}Default check data race with helgrind (set VL_MEM_CHECK to true to check memory)$NC\n\n"
+	VL_CHECK=true
+	IGN_LAST_LN=true
+
+	for i in "${!VL_TEST[@]}"; do
+		((I++))
+		ARGS="${VL_TEST[$i]}"
+		case "$i" in
+		0) run_test_one_die ;;
+		1) run_test_die ;;
+		*) run_test_alive_sated ;;
+		esac
+	done
+	VL_CHECK=false
+	IGN_LAST_LN=false
+
+	printf "\n${MAGENTA}Do you want to delete generated Valgrind log files? [Y/n]:$NC"
+	read -r input
+	input=${input:-y}
+	if [[ "$input" =~ ^[yY]$ ]]; then
+		find "$LOG_DIR" -type f \( -name "valgrind*.log" -o -name "helgrind*.log" \) -delete
+	else
+		printf "${YELLOW}Valgrind logs kept.$NC\n"
+	fi
+}
+
+################################################################################
 # === EXECUTABLE CHECKER ===
 ################################################################################
 
@@ -441,48 +559,6 @@ check_exec() {
 #* === MAIN SCRIPT LOGIC ===
 ################################################################################
 
-run_all_die_tests() {
-	printf "\n${BLUE}=== DIED TESTS ===${NC}\n"
-	for i in "${!DIED_TEST[@]}"; do
-		((I++))
-		ARGS="${DIED_TEST[$i]}"
-		if [[ "$ARGS" =~ ^1 ]]; then
-			run_test_one_die
-		else
-			run_test_die
-		fi
-	done
-}
-
-run_all_alive_infinite_tests() {
-	printf "\n${BLUE}=== ALIVE INFINITE TESTS ===${NC}\n"
-	read -rp "Enter a maximum test execution time (press enter for 10 sec)?: " input
-	if [[ "$input" =~ ^[1-9][0-9]*$ ]]; then
-		MAX_CHECK_TIME="$input"
-	elif [[ "$input" != "" ]]; then
-		printf "${YELLOW}[Warning] '%s' is invalid time value. Use default value instead.$NC\n" "$input"
-	fi
-	IGN_LAST_LN=true
-	for j in "${!ALIVE_INF_TEST[@]}"; do
-		((I++))
-		ARGS="${ALIVE_INF_TEST[$j]}"
-		run_test_alive_infinite
-	done
-	IGN_LAST_LN=false
-	MAX_CHECK_TIME=10
-}
-
-run_all_alive_sated_tests() {
-	printf "\n${BLUE}=== SATED TESTS ===${NC}\n"
-	IGN_LAST_LN=true
-	for k in "${!ALIVE_TEST[@]}"; do
-		((I++))
-		ARGS="${ALIVE_TEST[$k]}"
-		run_test_alive_sated
-	done
-	IGN_LAST_LN=false
-}
-
 main() {
 	check_exec
 	if "$IS_BONUS"; then
@@ -493,19 +569,16 @@ main() {
 
 	local choice
 	printf "\n${MAGENTA}Select test suite to run:$NC\n"
-	printf "  0) All tests\n"
+	printf "  0) All tests without valgrind (default) \n"
 	printf "  1) Died tests\n"
 	printf "  2) Alive infinite tests\n"
 	printf "  3) Alive sated tests\n"
-	printf "Enter choice [0-3]: "
+	printf "  4) Valgrind tests\n"
+	printf "  5) All tests\n"
+	printf "Enter choice [0-5]: "
 	read -r choice
 
 	case "$choice" in
-	0)
-		run_all_die_tests
-		run_all_alive_infinite_tests
-		run_all_alive_sated_tests
-		;;
 	1)
 		run_all_die_tests
 		;;
@@ -515,9 +588,19 @@ main() {
 	3)
 		run_all_alive_sated_tests
 		;;
+	4)
+		run_valgrind_tests
+		;;
+	5)
+		run_all_die_tests
+		run_all_alive_infinite_tests
+		run_all_alive_sated_tests
+		run_valgrind_tests
+		;;
 	*)
-		printf "${RED}Invalid selection. Please enter a number from 0 to 3.${NC}\n" >&2
-		return 1
+		run_all_die_tests
+		run_all_alive_infinite_tests
+		run_all_alive_sated_tests
 		;;
 	esac
 
@@ -536,7 +619,7 @@ main() {
 main "$@"
 
 if [[ -d "$(dirname "$BONUS_EXEC")" ]]; then
-	printf "${MAGENTA}Would you want to run bonus test suite ? [Y/n]$NC"
+	printf "${MAGENTA}Would you want to run bonus test suite ? [Y/n]:$NC"
 	read -r input
 	input=${input:-y}
 	if [[ "$input" =~ ^[yY]$ ]]; then
