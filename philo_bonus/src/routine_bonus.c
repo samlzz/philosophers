@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 14:29:43 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/27 18:47:54 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/27 19:08:51 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,13 +41,13 @@ static bool	_eat(t_data data, t_philo *phi)
 		return (1);
 	now = date_now() - data.start_time;
 	next_die = phi->next_meal_time - data.start_time;
-	if (now + data.time_to_eat >= next_die)
+	if (now + data.time_to_eat > next_die)
 		ft_usleep(next_die - now);
 	else
 		ft_usleep(data.time_to_eat);
 	sem_post(data.forks);
 	sem_post(data.forks);
-	if (now + data.time_to_eat >= next_die)
+	if (now + data.time_to_eat > next_die)
 		return (1);
 	phi->lst_meal_time = date_now();
 	phi->next_meal_time = phi->lst_meal_time + data.time_to_die;
