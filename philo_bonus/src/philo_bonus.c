@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 12:46:40 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/18 15:49:57 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/27 18:27:25 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,9 @@ void	*monitoring(void *param)
 	while (i++ < data->count)
 		sem_wait(data->sem_sated);
 	sem_wait(data->sem_print);
+	sem_post(data->sem_end);
 	printf("%ld All philosophers have eaten enough.\n", \
 		date_now() - data->start_time);
-	sem_post(data->sem_end);
 	sem_post(data->sem_print);
 	return (NULL);
 }

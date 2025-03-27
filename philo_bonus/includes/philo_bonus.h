@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/16 22:44:28 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/27 18:39:34 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ int16_t	children_process(uint32_t id, t_data data);
 
 // utils
 int64_t	date_now(void);
-void	philog(t_philo owner, t_paction state);
+void	philog(t_philo owner, t_paction state, bool ign_sem);
 void	ft_usleep(size_t milliseconds);
 void	close_sems(t_data *d_ptr);
 
