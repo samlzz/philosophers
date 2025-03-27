@@ -42,6 +42,7 @@ set_default() {
 	TOTAL=0
 	PASSED=0
 	FAILED=0
+	MAKED=false
 }
 set_default
 
@@ -203,24 +204,23 @@ check_interval() {
 }
 
 #`run_test_die`
-_check_death_timing() {
-	local to_die="$1"
-
-	local death_ln deatj last_meal
-	death_ln=$(echo "$output" | grep "died" | tail -n1)
-	death=$(awk '{print $1}' <<<"$death_ln")
-	last_meal=$(echo "$output" | grep "$(awk '{print $2}' <<<"$death_ln") is eating" | tail -n1 | awk '{print $1}')
-
-	if [[ -n "$last_meal" && -n "$death" ]]; then
-		local delay=$((death - last_meal))
-		local diff=$((delay - to_die))
-		if [[ "${diff#-}" -gt 10 ]]; then
-			herror "Philosopher do not died in good time after last meal (${delay}ms instead of ${to_die}ms)"
-			return 0
-		fi
+#? if philo can't die while eating
+is_last_line_death() {
+	if [[ -z "$output" ]]; then
+		printf "${RED}Error: output is empty in is_last_line_death${NC}\n" >&2
+		return 1
 	fi
+
+	local last_line
+	last_line=$(printf "%s" "$output" | tail -n1)
+
+	if [[ "$last_line" =~ ^[0-9]+\ [0-9]+\ died$ ]]; then
+		return 0
+	fi
+
 	return 1
 }
+#? else
 _check_death_timing() {
 	local to_die="$1"
 	local to_eat="$2"
@@ -247,7 +247,7 @@ _check_death_timing() {
 	last_meal="${meals[-1]}"
 	delay=$((death - last_meal))
 
-	if (( delay < to_eat )); then
+	if ((delay < to_eat)); then
 		if [[ "${#meals[@]}" -eq 1 ]]; then
 			last_meal=0
 		else
@@ -263,7 +263,21 @@ _check_death_timing() {
 	fi
 	return 1
 }
+_is_last_line_death() {
+	if [[ -z "$output" ]]; then
+		printf "${RED}Error: output is empty in is_last_line_death${NC}\n" >&2
+		return 1
+	fi
 
+	local last_line
+	last_line=$(printf "%s" "$output" | tail -n1)
+
+	if [[ "$last_line" =~ ^[0-9]+\ [0-9]+\ died$ ]]; then
+		return 0
+	fi
+
+	return 1
+}
 
 #`run_test_alive_infinite` & `run_test_alive_sated`
 _check_if_any_die() {
@@ -323,8 +337,7 @@ run_test_die() {
 		return
 	fi
 
-	if _check_death_timing "$(awk '{print $2}' <<< "$ARGS")" "$(awk '{print $3}' <<< "$ARGS")"
-	then return;	fi
+	if _check_death_timing "$(awk '{print $2}' <<<"$ARGS")" "$(awk '{print $3}' <<<"$ARGS")"; then return; fi
 
 	log_ok
 }
@@ -356,6 +369,11 @@ run_test_one_die() {
 		return
 	fi
 
+	if ! _is_last_line_death; then
+		herror "Some logs are printed after a death"
+		return
+	fi
+
 	log_ok
 }
 
@@ -376,6 +394,7 @@ check_exec() {
 	if [[ ! -x "$EXEC" ]]; then
 		printf "${MAGENTA}[Info] compiling '%s'...$NC\n" "$EXEC"
 		make -C "$exec_dir" >/dev/null
+		MAKED=true
 		if [[ ! -x "$EXEC" ]]; then
 			printf "${RED}[Error] Failed to compile '%s'.${NC}\n" "$EXEC" >&2
 			exit 1
@@ -389,7 +408,7 @@ check_exec() {
 	input=${input:-y}
 	if [[ "$input" =~ ^[yY]$ ]]; then
 		printf "$RED${R_BD}Deleted files:\n$NC"
-		mapfile -t deleted_files < <(find "./$LOG_DIR"/* -delete -print 2> /dev/null)
+		mapfile -t deleted_files < <(find "./$LOG_DIR"/* -delete -print 2>/dev/null)
 		if [[ "${#deleted_files[@]}" -gt 1 ]]; then
 			for ((i = 0; i < ${#deleted_files[@]}; i++)); do
 				if ((i == 0)); then
@@ -508,6 +527,7 @@ main() {
 		printf "  Failed tests : ${RED}%s${NC}\n" "$FAILED"
 	fi
 	printf "${BLUE}=========================${NC}\n"
+	if "$MAKED"; then make fclean -C "$(dirname $EXEC)" >/dev/null; fi
 }
 
 main "$@"
