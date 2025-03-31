@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/27 18:11:43 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/31 13:46:10 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,9 +65,9 @@ static inline int16_t	_run_simulation(t_data *dptr)
 	pthread_t	monitor;
 	int16_t		exit;
 
+	exit = 0;
 	if (dptr->must_eat_count != -1)
 	{
-		exit = 0;
 		if (pthread_create(&monitor, NULL, &meal_monitor, dptr))
 		{
 			set_shared(&dptr->sim_state, SH_SET, false);
