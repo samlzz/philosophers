@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:41:35 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/27 18:39:19 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/31 15:21:42 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,8 @@ void	philog(t_philo owner, t_paction state, bool ign_sem)
 	strs[ACT_DIE] = "died";
 	if (!ign_sem)
 		sem_wait(owner.__dptr->sem_print);
-	printf("%ld %d %s\n", date_now() - owner.__dptr->start_time, owner.id, strs[state]);
+	printf("%ld %d %s\n", date_now() - owner.__dptr->start_time, \
+		owner.id, strs[state]);
 	if (!ign_sem)
 		sem_post(owner.__dptr->sem_print);
 }

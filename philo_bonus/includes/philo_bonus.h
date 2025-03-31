@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/27 18:39:34 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/31 15:21:59 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,14 +58,14 @@ typedef struct s_data
 	sem_t		*forks;
 }	t_data;
 
-typedef struct s_philo {
+typedef struct s_philo
+{
 	uint32_t		id;
 	uint32_t		meals;
 	int64_t			lst_meal_time;
 	int64_t			next_meal_time;
 	struct s_data	*__dptr;
 }	t_philo;
-
 
 // init
 int16_t	init_data(t_data *d_ptr, int32_t ac, char const *av[]);

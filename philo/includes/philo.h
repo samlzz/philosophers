@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/26 13:50:48 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/31 15:20:24 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,7 @@
 #   if PHILO_SIZE + MUTEX_SIZE == 0
 #    error "Invalid value for PHILO_SIZE or MUTEX_SIZE"
 #   endif
-#   if PHI_MAX > ((STACK_SIZE - DATA_SIZE - 32768) / \
-(PHILO_SIZE + MUTEX_SIZE))
+#   if PHI_MAX > ((STACK_SIZE - DATA_SIZE - 32768) / (PHILO_SIZE + MUTEX_SIZE))
 #    warning the PHI_MAX provided is too large, use heap instead of stack \
 (define ALLOC_MODE to delete this warning)
 #    define ALLOC_MODE

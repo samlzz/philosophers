@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 12:56:14 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/27 18:18:40 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/31 15:22:23 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,11 +94,11 @@ static inline int16_t	open_semaphores(t_data *d_ptr)
 	{
 		d_ptr->sem_sated = sem_open(SEM_MEALS, O_CREAT, 0644, 0);
 		if (d_ptr->sem_sated == SEM_FAILED)
-			return(close_sems(d_ptr), 1);
+			return (close_sems(d_ptr), 1);
 	}
 	d_ptr->forks = sem_open(SEM_FORKS, O_CREAT, 0644, d_ptr->count);
 	if (d_ptr->forks == SEM_FAILED)
-		return(close_sems(d_ptr), 1);
+		return (close_sems(d_ptr), 1);
 	sem_unlink(SEM_END);
 	sem_unlink(SEM_START);
 	sem_unlink(SEM_PRINT);

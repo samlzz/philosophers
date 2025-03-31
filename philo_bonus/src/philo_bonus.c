@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 12:46:40 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/31 15:08:24 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/03/31 15:22:41 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,5 +84,5 @@ int	main(int argc, char const *argv[])
 	pthread_detach(monitor);
 	_wait_childrens(childs, data);
 	close_sems(&data);
-	return (0);	
+	return (0);
 }
