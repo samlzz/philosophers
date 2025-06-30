@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/28 15:32:18 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/31 15:21:17 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/06/30 17:01:40 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ static bool	_eat(t_philo *phi)
 	return (0);
 }
 
-static bool	_sleep(t_philo *phi)
+static bool	_sleep_and_think(t_philo *phi)
 {
 	uint64_t	curr_time;
 
@@ -84,11 +84,6 @@ static bool	_sleep(t_philo *phi)
 		return (1);
 	}
 	ft_usleep(phi->data->time_to_sleep);
-	return (0);
-}
-
-static bool	_think(t_philo *phi)
-{
 	pthread_mutex_lock(&phi->data->print_mutex);
 	if (!get_shared(&phi->data->sim_state))
 		return (pthread_mutex_unlock(&phi->data->print_mutex), 1);
@@ -98,7 +93,7 @@ static bool	_think(t_philo *phi)
 	return (0);
 }
 
-void	*philo_life(void *param)
+static inline t_philo	*_philo_prep(void *param)
 {
 	t_philo	*phi;
 
@@ -111,9 +106,17 @@ void	*philo_life(void *param)
 		ft_usleep(3);
 	phi->last_meal_time = phi->data->start_time;
 	phi->next_meal_time = phi->last_meal_time + phi->data->time_to_die;
+	return (phi);
+}
+
+void	*philo_life(void *param)
+{
+	t_philo	*phi;
+
+	phi = _philo_prep(param);
 	while (get_shared(&phi->data->sim_state))
 	{
-		if (_eat(phi) || _sleep(phi) || _think(phi))
+		if (_eat(phi) || _sleep_and_think(phi))
 		{
 			pthread_mutex_lock(&phi->data->sim_state.mtx);
 			if (phi->data->sim_state.__val)
