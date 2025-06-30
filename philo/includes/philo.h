@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/31 15:27:46 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/06/30 17:25:24 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,13 +51,13 @@ unsigned int (the last one need to be greater than 0)\n"
 # define ERR_INIT_THREAD "Error: failed to create thread\n"
 
 # ifdef ALLOC_MODE
-#  define IS_ALLOC true
+#  define IS_ALLOC 1
 #  define ERR_ALLOC "Error: Allocation failed\n"
 #  ifndef PHI_MAX
 #   define PHI_MAX 0
 #  endif
 # else
-#  define IS_ALLOC false
+#  define IS_ALLOC 0
 #  define ERR_PHI_MAX_TOHIGH "Error: 'PHI_MAX' is lower than number of \
 philosophers you provide\n"
 # endif

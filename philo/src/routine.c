@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/28 15:32:18 by sliziard          #+#    #+#             */
-/*   Updated: 2025/06/30 17:01:40 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/06/30 17:21:12 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,15 @@
 static inline bool	_take_forks(t_philo *phi)
 {
 	t_mutex	*one;
-	t_mutex *two;
+	t_mutex	*two;
 
 	one = phi->right_fork;
 	two = phi->left_fork;
 	if (phi->id % 2)
-		(one = phi->left_fork, \
-		two = phi->right_fork);
+	{
+		one = phi->left_fork;
+		two = phi->right_fork;
+	}
 	pthread_mutex_lock(one);
 	if (one == two)
 		return (philog(*phi, ACT_FORK, MX_BOTH), \
@@ -35,8 +37,7 @@ static inline bool	_take_forks(t_philo *phi)
 		return (pthread_mutex_unlock(one), \
 				pthread_mutex_unlock(two), \
 				pthread_mutex_unlock(&phi->data->print_mutex), 1);
-	philog(*phi, ACT_FORK, MX_NONE);
-	philog(*phi, ACT_FORK, MX_NONE);
+	(philog(*phi, ACT_FORK, MX_NONE), philog(*phi, ACT_FORK, MX_NONE));
 	philog(*phi, ACT_EAT, MX_UNLOCK);
 	return (0);
 }
@@ -51,7 +52,7 @@ static bool	_eat(t_philo *phi)
 	now = date_now() - phi->data->start_time;
 	next_die = phi->next_meal_time - phi->data->start_time;
 	if (now + phi->data->time_to_eat > next_die)
-			ft_usleep(next_die - now);
+		ft_usleep(next_die - now);
 	else
 		ft_usleep(phi->data->time_to_eat);
 	pthread_mutex_unlock(phi->left_fork);
