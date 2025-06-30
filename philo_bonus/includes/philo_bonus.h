@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/31 15:21:59 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/06/30 16:05:30 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,6 @@
 # include <stdint.h>
 
 # define USLEEP_INTERVAL 500
-# define ODD_DELAY 200
-# define THINK_DELAY 50
 
 # define ERR_ARG_NB "Error: Wrong number of arguments. Usage: ./philo \
 <number_of_philosophers <time_to_die> <time_to_eat> <time_to_sleep> \
