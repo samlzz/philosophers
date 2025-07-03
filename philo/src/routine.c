@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/28 15:32:18 by sliziard          #+#    #+#             */
-/*   Updated: 2025/06/30 17:21:12 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/07/03 13:09:31 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,16 +27,16 @@ static inline bool	_take_forks(t_philo *phi)
 	}
 	pthread_mutex_lock(one);
 	if (one == two)
-		return (philog(*phi, ACT_FORK, MX_BOTH), \
-				ft_usleep(phi->next_meal_time - date_now()), \
-				pthread_mutex_unlock(one), 1);
+		return (philog(*phi, ACT_FORK, MX_BOTH),
+			ft_usleep(phi->next_meal_time - date_now()),
+			pthread_mutex_unlock(one), 1);
 	pthread_mutex_lock(two);
 	pthread_mutex_lock(&phi->data->print_mutex);
 	if (date_now() >= phi->next_meal_time || \
 			!get_shared(&phi->data->sim_state))
-		return (pthread_mutex_unlock(one), \
-				pthread_mutex_unlock(two), \
-				pthread_mutex_unlock(&phi->data->print_mutex), 1);
+		return (pthread_mutex_unlock(one),
+			pthread_mutex_unlock(two),
+			pthread_mutex_unlock(&phi->data->print_mutex), 1);
 	(philog(*phi, ACT_FORK, MX_NONE), philog(*phi, ACT_FORK, MX_NONE));
 	philog(*phi, ACT_EAT, MX_UNLOCK);
 	return (0);

@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 20:54:03 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/24 20:04:16 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/07/03 13:10:14 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ static inline uint32_t	ascii_to_uint(const char *nptr, int *error)
 	return ((unsigned int)r);
 }
 
-static inline int	_set_nb(char const *nb, int32_t *sign_field, \
+static inline int	_set_nb(char const *nb, int32_t *sign_field,
 	uint32_t *field)
 {
 	int32_t		has_err;
@@ -64,7 +64,7 @@ int16_t	init_data(t_data *d_ptr, int ac, char const *av[])
 {
 	memset(d_ptr, 0, sizeof(t_data));
 	if (_set_nb(av[0], NULL, &d_ptr->count) || \
-	(!IS_ALLOC && d_ptr->count > PHI_MAX))
+		(!IS_ALLOC && d_ptr->count > PHI_MAX))
 		return ((d_ptr->count > PHI_MAX) * 2 + !(d_ptr->count > PHI_MAX) * 1);
 	if (_set_nb(av[1], NULL, &d_ptr->time_to_die))
 		return (1);

@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 15:41:35 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/31 15:19:45 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/07/03 13:07:01 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,8 @@ void	philog(t_philo phi, t_paction state, t_mtx_act action)
 	strs[ACT_DIE] = "died";
 	if (action == MX_LOCK || action == MX_BOTH)
 		pthread_mutex_lock(&phi.data->print_mutex);
-	printf("%ld %d %s\n", date_now() - phi.data->start_time, \
-		phi.id, strs[state]);
+	printf("%ld %d %s\n", date_now() - phi.data->start_time, phi.id,
+		strs[state]);
 	if (action == MX_UNLOCK || action == MX_BOTH)
 		pthread_mutex_unlock(&phi.data->print_mutex);
 }

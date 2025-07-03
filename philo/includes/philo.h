@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:26 by sliziard          #+#    #+#             */
-/*   Updated: 2025/06/30 17:25:24 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/07/03 13:11:31 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,8 @@ typedef struct s_philo
 	struct s_data	*data;
 }	t_philo;
 
-typedef enum e_shared_ope{
+typedef enum e_shared_ope
+{
 	SH_SET,
 	SH_INCREMENT,
 	SH_DECREMENT
@@ -121,8 +122,8 @@ typedef struct s_data
 }	t_data;
 
 // init
-int16_t		init_philo_and_forks(t_data *d_ptr, t_philo *philos, \
-		t_mutex *forks);
+int16_t		init_philo_and_forks(t_data *d_ptr, t_philo *philos,
+				t_mutex *forks);
 int16_t		init_data(t_data *d_ptr, int ac, char const *av[]);
 
 // routine

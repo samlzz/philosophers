@@ -6,7 +6,7 @@
 /*   By: sliziard <sliziard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 14:08:29 by sliziard          #+#    #+#             */
-/*   Updated: 2025/03/31 15:28:13 by sliziard         ###   ########.fr       */
+/*   Updated: 2025/07/03 13:07:34 by sliziard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static void	*meal_monitor(void *param)
 		ft_usleep(MONITOR_DELAY);
 	}
 	if (!killed)
-		printf("%ld All philosophers have eaten enough.\n", \
+		printf("%ld All philosophers have eaten enough.\n",
 			date_now() - data->start_time);
 	return (NULL);
 }
@@ -122,7 +122,7 @@ int	main(int argc, char const *argv[])
 	philos = malloc(data.count * sizeof(t_philo));
 	forks = malloc(data.count * sizeof(t_mutex));
 	if (!philos || !forks)
-		return (free(philos), free(forks), \
+		return (free(philos), free(forks),
 			write(2, ERR_ALLOC, 25), 1);
 	if (init_philo_and_forks(&data, philos, forks))
 	{
